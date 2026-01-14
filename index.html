@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> الزهراني| تحديث الزهراني </title>
+    <title>الزهراني لوجستيك | نظام تحديث بترواب</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -549,6 +549,43 @@
             border-radius: 12px;
         }
 
+        /* Custom Option Styles */
+        .custom-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .custom-option input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .custom-option .btn-add {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .custom-option .btn-add:hover {
+            background: #2e7d32;
+        }
+
         /* Tables */
         .table-container {
             overflow-x: auto;
@@ -913,11 +950,11 @@
         <div class="logo-container">
             <div class="logo-main">
                 <div class="logo-circle">
-                    <img src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop,q=95/dOqNLp8LNNTl7Vlk/alzahrani-logistics-corporate-logo-photoroom-AR03Qav69VTGKk9B.png" alt="شعار الترهاب">
+                    <img src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop,q=95/dOqNLp8LNNTl7Vlk/alzahrani-logistics-corporate-logo-photoroom-AR03Qav69VTGKk9B.png" alt="شعار الزهراني لوجستيك">
                 </div>
                 <div class="logo-text">
-                    <div class="logo-arabic">الترهاب</div>
-                    <div class="logo-english">تحديث بترواب</div>
+                    <div class="logo-arabic">الزهراني لوجستيك</div>
+                    <div class="logo-english">Alzahrani Logistics</div>
                     <div class="logo-subtitle">نظام تحديث بيانات الوقود والمركبات</div>
                 </div>
             </div>
@@ -976,13 +1013,29 @@
                         <div class="projects-list" id="projectsList">
                             <!-- Projects will be populated by JavaScript -->
                         </div>
+                        <!-- Custom Project Input -->
+                        <div class="custom-option">
+                            <input type="text" id="customProjectInput" placeholder="أضف مشروع جديد يدوياً...">
+                            <button type="button" class="btn-add" onclick="addCustomProject()">
+                                <i class="fas fa-plus"></i> إضافة
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="form-label" data-i18n="area">المنطقة</label>
-                    <select id="regArea" class="form-input" required>
-                        <option value="" data-i18n="selectArea">اختر المنطقة</option>
-                    </select>
+                    <div style="position: relative;">
+                        <select id="regArea" class="form-input" required>
+                            <option value="" data-i18n="selectArea">اختر المنطقة</option>
+                        </select>
+                        <!-- Custom Area Input -->
+                        <div class="custom-option" style="margin-top: 10px;">
+                            <input type="text" id="customAreaInput" placeholder="أضف منطقة جديدة يدوياً...">
+                            <button type="button" class="btn-add" onclick="addCustomArea()">
+                                <i class="fas fa-plus"></i> إضافة
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-success">
                     <i class="fas fa-user-plus"></i>
@@ -1592,16 +1645,16 @@
             }
         };
 
-        // Saudi Arabia Areas
-        const saudiAreas = [
+        // Saudi Arabia Areas - Initial List
+        let saudiAreas = [
             "الرياض", "مكة المكرمة", "المدينة المنورة", "الدمام", "الخبر",
             "جدة", "الطائف", "تبوك", "حائل", "بريدة",
             "سكاكا", "أبها", "جازان", "نجران", "الباحة",
             "عرعر", "القريات", "الجبيل", "ينبع", "رابغ"
         ];
 
-        // List of Projects with areas
-        const projectsList = [
+        // List of Projects with areas - Initial List
+        let projectsList = [
             { name: "المراعي", area: "الرياض" },
             { name: "ارامكس", area: "الرياض" },
             { name: "كيمارت دبابات", area: "الدمام" },
@@ -1651,6 +1704,7 @@
         let currentLanguage = 'ar';
         let excelData = [];
         let selectedProject = '';
+        let selectedArea = '';
 
         // Initialize the application
         function initApp() {
@@ -1677,6 +1731,81 @@
                     });
                 }
             });
+        }
+
+        // Add custom area
+        function addCustomArea() {
+            const customAreaInput = document.getElementById('customAreaInput');
+            const areaName = customAreaInput.value.trim();
+            
+            if (!areaName) {
+                showMessage('authMessage', 'الرجاء إدخال اسم المنطقة', 'error');
+                return;
+            }
+            
+            // Check if area already exists
+            if (saudiAreas.includes(areaName)) {
+                showMessage('authMessage', 'هذه المنطقة موجودة بالفعل', 'info');
+                return;
+            }
+            
+            // Add to areas list
+            saudiAreas.push(areaName);
+            
+            // Update all area selects
+            loadAreas();
+            
+            // Set the newly added area as selected
+            const regAreaSelect = document.getElementById('regArea');
+            regAreaSelect.value = areaName;
+            selectedArea = areaName;
+            
+            // Clear input
+            customAreaInput.value = '';
+            
+            showMessage('authMessage', `تمت إضافة المنطقة "${areaName}" بنجاح`, 'success');
+        }
+
+        // Add custom project
+        function addCustomProject() {
+            const customProjectInput = document.getElementById('customProjectInput');
+            const projectName = customProjectInput.value.trim();
+            
+            if (!projectName) {
+                showMessage('authMessage', 'الرجاء إدخال اسم المشروع', 'error');
+                return;
+            }
+            
+            // Check if project already exists
+            if (projectsList.some(p => p.name === projectName)) {
+                showMessage('authMessage', 'هذا المشروع موجود بالفعل', 'info');
+                return;
+            }
+            
+            // Get selected area or use default
+            const selectedArea = document.getElementById('regArea').value || 'الرياض';
+            
+            // Add to projects list
+            projectsList.push({ name: projectName, area: selectedArea });
+            
+            // Reload projects list
+            loadProjectsLists();
+            
+            // Set the newly added project as selected
+            const projectsListContainer = document.getElementById('projectsList');
+            projectsListContainer.querySelectorAll('.project-item').forEach(item => {
+                if (item.querySelector('span').textContent === projectName) {
+                    item.classList.add('selected');
+                }
+            });
+            
+            selectedProject = projectName;
+            document.getElementById('regProject').value = projectName;
+            
+            // Clear input
+            customProjectInput.value = '';
+            
+            showMessage('authMessage', `تمت إضافة المشروع "${projectName}" بنجاح`, 'success');
         }
 
         // Load projects to all project lists
@@ -1747,7 +1876,7 @@
             if (filteredProjects.length === 0) {
                 const noResults = document.createElement('div');
                 noResults.className = 'project-item';
-                noResults.innerHTML = '<span style="color: #666;">لا توجد نتائج</span>';
+                noResults.innerHTML = '<span style="color: #666;">لا توجد نتائج - يمكنك إضافة مشروع جديد</span>';
                 container.appendChild(noResults);
             }
         }
@@ -1898,16 +2027,24 @@
             document.getElementById('registerForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
-                if (!selectedProject) {
-                    showMessage('authMessage', 'الرجاء اختيار مشروع', 'error');
+                const projectValue = selectedProject || document.getElementById('regProject').value;
+                const areaValue = document.getElementById('regArea').value;
+                
+                if (!projectValue) {
+                    showMessage('authMessage', 'الرجاء اختيار أو إضافة مشروع', 'error');
+                    return;
+                }
+                
+                if (!areaValue) {
+                    showMessage('authMessage', 'الرجاء اختيار أو إضافة منطقة', 'error');
                     return;
                 }
                 
                 const user = {
                     username: document.getElementById('regUsername').value,
                     password: document.getElementById('regPassword').value,
-                    project: selectedProject,
-                    area: document.getElementById('regArea').value,
+                    project: projectValue,
+                    area: areaValue,
                     role: 'supervisor',
                     status: 'pending',
                     createdAt: new Date().toISOString(),
