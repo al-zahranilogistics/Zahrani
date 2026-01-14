@@ -1,0 +1,2634 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الزهراني| تحديث الزهراني</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #0d47a1;
+            --success: #2e7d32;
+            --danger: #c62828;
+            --warning: #f57c00;
+            --info: #0277bd;
+            --light: #f5f5f5;
+            --dark: #121212;
+            --border: #e0e0e0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+            --glow: 0 0 20px rgba(26, 35, 126, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', 'Cairo', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Language Toggle */
+        .lang-toggle {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            z-index: 1000;
+            background: white;
+            border-radius: 50px;
+            padding: 6px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 2px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .lang-btn {
+            background: none;
+            border: none;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            color: #555;
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            transform: scale(1.05);
+            box-shadow: var(--glow);
+        }
+
+        .lang-btn:hover:not(.active) {
+            background: #f0f0f0;
+            color: var(--primary);
+        }
+
+        /* Header & Logo */
+        header {
+            background: white;
+            padding: 25px 0 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .logo-container {
+            max-width: 800px;
+            margin: 0 auto 20px;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .logo-main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .logo-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid white;
+            box-shadow: var(--glow), 0 0 30px rgba(26, 35, 126, 0.4);
+            animation: glowPulse 3s infinite alternate;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes glowPulse {
+            0% { box-shadow: var(--glow), 0 0 20px rgba(26, 35, 126, 0.3); }
+            100% { box-shadow: var(--glow), 0 0 40px rgba(26, 35, 126, 0.6); }
+        }
+
+        .logo-circle:hover {
+            transform: scale(1.05);
+            box-shadow: var(--glow), 0 0 50px rgba(26, 35, 126, 0.7);
+        }
+
+        .logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .logo-text {
+            text-align: center;
+        }
+
+        .logo-arabic {
+            color: var(--primary);
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            font-family: 'Cairo', sans-serif;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .logo-english {
+            color: var(--secondary);
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-subtitle {
+            color: #666;
+            font-size: 1.2rem;
+            font-weight: 500;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            padding: 2px 0;
+        }
+
+        .system-title {
+            text-align: center;
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin: 10px auto 25px;
+            padding: 12px 30px;
+            background: rgba(26, 35, 126, 0.05);
+            border-radius: var(--radius);
+            display: inline-block;
+            border-right: 4px solid var(--primary);
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 25px;
+        }
+
+        /* Auth Container */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 70vh;
+            padding: 20px;
+        }
+
+        .auth-box {
+            background: white;
+            border-radius: var(--radius);
+            padding: 40px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 35px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 18px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            color: #666;
+        }
+
+        .auth-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: rgba(26, 35, 126, 0.03);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            letter-spacing: 0.3px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(26, 35, 126, 0.2);
+        }
+
+        .btn-success { background: linear-gradient(135deg, var(--success), #4caf50); }
+        .btn-warning { background: linear-gradient(135deg, var(--warning), #ff9800); }
+        .btn-danger { background: linear-gradient(135deg, var(--danger), #f44336); }
+        .btn-info { background: linear-gradient(135deg, var(--info), #29b6f6); }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .user-info {
+            background: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            border-right: 5px solid var(--primary);
+        }
+
+        .user-details h3 {
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 1.5rem;
+        }
+
+        .user-details p {
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-details i {
+            color: var(--secondary);
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #d32f2f, #f44336);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(211, 47, 47, 0.3);
+        }
+
+        /* Dashboard Navigation */
+        .dashboard-nav {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .nav-btn {
+            background: white;
+            border: none;
+            padding: 30px 20px;
+            border-radius: var(--radius);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            border-top: 4px solid transparent;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+        }
+
+        .nav-btn.vehicle { border-top-color: #4caf50; }
+        .nav-btn.records { border-top-color: #2196f3; }
+        .nav-btn.admin { border-top-color: #ff9800; }
+        .nav-btn.profile { border-top-color: #9c27b0; }
+        .nav-btn.excel { border-top-color: #009688; }
+
+        .nav-btn i {
+            font-size: 46px;
+            margin-bottom: 5px;
+        }
+
+        .nav-btn.vehicle i { color: #4caf50; }
+        .nav-btn.records i { color: #2196f3; }
+        .nav-btn.admin i { color: #ff9800; }
+        .nav-btn.profile i { color: #9c27b0; }
+        .nav-btn.excel i { color: #009688; }
+
+        .nav-btn span {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .nav-btn p {
+            color: #666;
+            font-size: 0.95rem;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        /* Content Sections */
+        .content-section {
+            background: white;
+            border-radius: var(--radius);
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            display: none;
+            border: 1px solid #eee;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: slideUp 0.4s ease;
+        }
+
+        .section-title {
+            color: var(--primary);
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            font-size: 1.7rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-title i {
+            color: var(--secondary);
+            background: rgba(26, 35, 126, 0.08);
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        /* Vehicle Form */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .file-upload-area {
+            border: 3px dashed #bdbdbd;
+            border-radius: var(--radius);
+            padding: 50px 30px;
+            text-align: center;
+            margin: 30px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f9f9f9;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(26, 35, 126, 0.02);
+        }
+
+        .file-upload-area i {
+            font-size: 60px;
+            color: #757575;
+            margin-bottom: 20px;
+        }
+
+        .file-upload-area h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+        }
+
+        .file-upload-area p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* Project Selection */
+        .project-selection {
+            margin: 20px 0;
+        }
+
+        .project-search {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .project-search input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #fafafa;
+        }
+
+        .project-search i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .projects-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px;
+            background: #f9f9f9;
+        }
+
+        .project-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .project-item:hover {
+            background: #e3f2fd;
+            transform: translateX(-5px);
+        }
+
+        .project-item.selected {
+            background: #e8f5e9;
+            border-right: 4px solid #4caf50;
+            font-weight: 500;
+        }
+
+        .project-item:last-child {
+            border-bottom: none;
+        }
+
+        .project-area {
+            font-size: 0.85rem;
+            color: #666;
+            background: #eee;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid #eee;
+            margin-top: 20px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .data-table th {
+            padding: 18px 20px;
+            text-align: right;
+            color: white;
+            font-weight: 600;
+            font-size: 1.05rem;
+            border: none;
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        .data-table td {
+            padding: 18px 20px;
+            text-align: right;
+            color: #444;
+            vertical-align: middle;
+        }
+
+        .timestamp-cell {
+            direction: ltr;
+            text-align: left;
+            font-family: monospace;
+            font-size: 0.95rem;
+            color: #666;
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 8px 12px;
+            display: inline-block;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            min-width: 90px;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .edit-btn { background: linear-gradient(135deg, #ff9800, #ffb74d); }
+        .delete-btn { background: linear-gradient(135deg, #f44336, #ef5350); }
+        .approve-btn { background: linear-gradient(135deg, #4caf50, #66bb6a); }
+        .update-btn { background: linear-gradient(135deg, #2196f3, #42a5f5); }
+        .view-btn { background: linear-gradient(135deg, #9c27b0, #ab47bc); }
+
+        /* Admin Specific */
+        .admin-only {
+            border-left: 5px solid var(--warning);
+            position: relative;
+        }
+
+        .admin-only::before {
+            content: "👑";
+            position: absolute;
+            top: -12px;
+            left: -15px;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        .status-active { background: #e8f5e9; color: #2e7d32; }
+        .status-pending { background: #fff3e0; color: #ef6c00; }
+        .status-inactive { background: #ffebee; color: #c62828; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideUp 0.4s ease;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            padding: 25px 30px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .modal-header h2 {
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background: #f5f5f5;
+            color: var(--danger);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        /* Messages */
+        .message {
+            padding: 18px 25px;
+            border-radius: var(--radius);
+            margin: 20px 0;
+            display: none;
+            align-items: center;
+            gap: 15px;
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+
+        .message i {
+            font-size: 22px;
+        }
+
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-color: #c8e6c9;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            border-color: #ffcdd2;
+        }
+
+        .info {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-color: #bbdefb;
+        }
+
+        /* Excel Preview */
+        .excel-preview {
+            margin-top: 30px;
+        }
+
+        .preview-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* RTL/LTR Support */
+        [dir="rtl"] {
+            text-align: right;
+        }
+
+        [dir="ltr"] {
+            text-align: left;
+        }
+
+        [dir="ltr"] .lang-toggle {
+            right: auto;
+            left: 25px;
+        }
+
+        [dir="ltr"] .user-info {
+            border-right: none;
+            border-left: 5px solid var(--primary);
+        }
+
+        [dir="ltr"] .admin-only {
+            border-left: none;
+            border-right: 5px solid var(--warning);
+        }
+
+        [dir="ltr"] .admin-only::before {
+            left: auto;
+            right: -15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .dashboard-nav {
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            }
+            
+            .content-section {
+                padding: 25px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .auth-box {
+                padding: 30px 25px;
+                margin: 15px;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .logo-main {
+                gap: 15px;
+            }
+            
+            .logo-circle {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .logo-arabic {
+                font-size: 2.2rem;
+            }
+            
+            .logo-english {
+                font-size: 1.6rem;
+            }
+            
+            .nav-btn {
+                padding: 25px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .lang-toggle {
+                top: 15px;
+                right: 15px;
+            }
+            
+            .lang-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Toggle -->
+    <div class="lang-toggle">
+        <button class="lang-btn active" onclick="changeLanguage('ar')" data-lang="ar">
+            <i class="fas fa-language"></i>
+        </button>
+        <button class="lang-btn" onclick="changeLanguage('en')" data-lang="en">
+            <i class="fas fa-language"></i>
+        </button>
+    </div>
+
+    <!-- Header with Logo -->
+    <header>
+        <div class="logo-container">
+            <div class="logo-main">
+                <div class="logo-circle">
+                    <img src="https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=375,fit=crop,q=95/dOqNLp8LNNTl7Vlk/alzahrani-logistics-corporate-logo-photoroom-AR03Qav69VTGKk9B.png" alt="شعار الترهاب">
+                </div>
+                <div class="logo-text">
+                    <div class="logo-arabic">الترهاب</div>
+                    <div class="logo-english">تحديث بترواب</div>
+                    <div class="logo-subtitle">نظام تحديث بيانات الوقود والمركبات</div>
+                </div>
+            </div>
+            <div class="system-title">
+                <i class="fas fa-gas-pump"></i>
+                <span data-i18n="systemTitle">نظام تحديث بيانات الوقود والمركبات</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Login/Register Container -->
+    <div class="container auth-container" id="authContainer">
+        <div class="auth-box">
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="showAuthForm('login')" data-i18n="login">تسجيل الدخول</div>
+                <div class="auth-tab" onclick="showAuthForm('register')" data-i18n="register">تسجيل مشرف جديد</div>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form active">
+                <div class="form-group">
+                    <label class="form-label" data-i18n="username">اسم المستخدم</label>
+                    <input type="text" id="loginUsername" class="form-input" placeholder="أدخل اسم المستخدم" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-i18n="password">كلمة المرور</label>
+                    <input type="password" id="loginPassword" class="form-input" placeholder="أدخل كلمة المرور" required>
+                </div>
+                <button type="submit" class="btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span data-i18n="loginBtn">دخول إلى النظام</span>
+                </button>
+                <div class="form-group" style="margin-top: 20px; text-align: center; color: #666; font-size: 0.95rem;">
+                    <i class="fas fa-info-circle"></i>
+                    <span data-i18n="adminHint">المسؤول: هوندا | كلمة المرور: 0906212775</span>
+                </div>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label" data-i18n="username">اسم المستخدم</label>
+                    <input type="text" id="regUsername" class="form-input" placeholder="اختر اسم مستخدم فريد" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-i18n="password">كلمة المرور</label>
+                    <input type="password" id="regPassword" class="form-input" placeholder="كلمة مرور قوية" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-i18n="project">المشروع المسؤول عنه</label>
+                    <div class="project-selection">
+                        <div class="project-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="projectSearch" placeholder="ابحث عن المشروع..." onkeyup="filterProjects()">
+                        </div>
+                        <div class="projects-list" id="projectsList">
+                            <!-- Projects will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-i18n="area">المنطقة</label>
+                    <select id="regArea" class="form-input" required>
+                        <option value="" data-i18n="selectArea">اختر المنطقة</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-user-plus"></i>
+                    <span data-i18n="registerBtn">تسجيل المشرف الجديد</span>
+                </button>
+            </form>
+
+            <!-- Messages -->
+            <div id="authMessage" class="message"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="container dashboard" id="dashboard">
+        <!-- User Info -->
+        <div class="user-info">
+            <div class="user-details">
+                <h3 id="userName"></h3>
+                <p>
+                    <i class="fas fa-user-tag"></i>
+                    <span id="userRole"></span>
+                    | 
+                    <i class="fas fa-project-diagram"></i>
+                    <span id="userProject"></span>
+                    |
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span id="userArea"></span>
+                </p>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span data-i18n="logout">تسجيل الخروج</span>
+            </button>
+        </div>
+
+        <!-- Navigation -->
+        <div class="dashboard-nav">
+            <button class="nav-btn vehicle" onclick="showSection('vehicleSection')">
+                <i class="fas fa-truck-moving"></i>
+                <span data-i18n="addVehicle">إضافة مركبة جديدة</span>
+                <p data-i18n="addVehicleDesc">إدخال بيانات مركبة جديدة يدوياً</p>
+            </button>
+            
+            <button class="nav-btn excel" onclick="showSection('excelSection')">
+                <i class="fas fa-file-excel"></i>
+                <span data-i18n="uploadExcel">رفع ملف إكسل</span>
+                <p data-i18n="uploadExcelDesc">رفع ملف إكسل يحتوي على بيانات مركبات</p>
+            </button>
+            
+            <button class="nav-btn records" onclick="showSection('recordsSection')">
+                <i class="fas fa-database"></i>
+                <span data-i18n="viewRecords">عرض جميع السجلات</span>
+                <p data-i18n="viewRecordsDesc">عرض وتعديل سجلات المركبات</p>
+            </button>
+            
+            <button class="nav-btn admin" onclick="showSection('adminSection')" id="adminNavBtn">
+                <i class="fas fa-crown"></i>
+                <span data-i18n="adminPanel">لوحة تحكم المسؤول</span>
+                <p data-i18n="adminPanelDesc">إدارة المشرفين والصلاحيات</p>
+            </button>
+            
+            <button class="nav-btn profile" onclick="showSection('profileSection')">
+                <i class="fas fa-user-cog"></i>
+                <span data-i18n="updateProfile">الملف الشخصي</span>
+                <p data-i18n="updateProfileDesc">تحديث بيانات الحساب الشخصي</p>
+            </button>
+        </div>
+
+        <!-- Vehicle Entry Section -->
+        <div id="vehicleSection" class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-truck-moving"></i>
+                <span data-i18n="vehicleEntry">إدخال بيانات مركبة جديدة</span>
+            </h2>
+            <form id="vehicleForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="plateNumber">رقم اللوحة</label>
+                        <input type="text" id="plateNumber" class="form-input" placeholder="مثال: أ ب ج 1234" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="area">المنطقة</label>
+                        <select id="vehicleArea" class="form-input" required>
+                            <option value="" data-i18n="selectArea">اختر المنطقة</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Project Selection with Search -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="previousProject">المشروع السابق</label>
+                        <div class="project-selection">
+                            <div class="project-search">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="prevProjectSearch" placeholder="ابحث عن المشروع السابق..." onkeyup="filterPrevProjects()">
+                            </div>
+                            <div class="projects-list" id="prevProjectsList" style="max-height: 200px;">
+                                <!-- Previous projects will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <input type="hidden" id="previousProject">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="currentProject">المشروع الحالي</label>
+                        <div class="project-selection">
+                            <div class="project-search">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="currProjectSearch" placeholder="ابحث عن المشروع الحالي..." onkeyup="filterCurrProjects()">
+                            </div>
+                            <div class="projects-list" id="currProjectsList" style="max-height: 200px;">
+                                <!-- Current projects will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <input type="hidden" id="currentProject">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="basicFuelQuota">حصة الوقود الأساسية (لتر)</label>
+                        <input type="number" id="fuelQuota" class="form-input" placeholder="مثال: 500" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="additionalInfo">معلومات إضافية (اختياري)</label>
+                        <input type="text" id="additionalInfo" class="form-input" placeholder="ملاحظات إضافية عن المركبة">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i>
+                    <span data-i18n="saveVehicle">حفظ بيانات المركبة</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Excel Upload Section -->
+        <div id="excelSection" class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-file-excel"></i>
+                <span data-i18n="uploadExcel">رفع ملف إكسل للبيانات</span>
+            </h2>
+            <div class="file-upload-area" onclick="document.getElementById('excelFileInput').click()" id="excelDropArea">
+                <i class="fas fa-file-upload"></i>
+                <h4 data-i18n="dropFile">اسحب وأفلت ملف إكسل هنا</h4>
+                <p data-i18n="clickToUpload">أو انقر لاختيار الملف من الجهاز</p>
+                <p style="color: #666; font-size: 0.9rem;" data-i18n="excelFormat">
+                    يجب أن يحتوي الملف على الأعمدة التالية بالترتيب:<br>
+                    رقم اللوحة، المشروع السابق، المشروع الحالي، المنطقة، حصة الوقود الأساسية
+                </p>
+                <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelFileSelect(event)">
+            </div>
+            
+            <!-- Excel Preview Table -->
+            <div class="excel-preview" id="excelPreview" style="display: none;">
+                <div class="preview-title">
+                    <h3><i class="fas fa-table"></i> <span data-i18n="previewData">معاينة البيانات</span></h3>
+                    <button class="btn btn-success" onclick="uploadExcelData()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span data-i18n="uploadData">رفع البيانات إلى النظام</span>
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="excelPreviewTable">
+                        <thead>
+                            <tr>
+                                <th data-i18n="plateNumber">رقم اللوحة</th>
+                                <th data-i18n="previousProject">المشروع السابق</th>
+                                <th data-i18n="currentProject">المشروع الحالي</th>
+                                <th data-i18n="area">المنطقة</th>
+                                <th data-i18n="basicFuelQuota">حصة الوقود (لتر)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="excelPreviewBody">
+                            <!-- Excel data will be previewed here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Records Section -->
+        <div id="recordsSection" class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-database"></i>
+                <span data-i18n="vehicleRecords">سجلات المركبات</span>
+            </h2>
+            <div class="form-row" style="margin-bottom: 30px;">
+                <div class="form-group">
+                    <label class="form-label" data-i18n="filterBy">تصفية حسب:</label>
+                    <select id="filterArea" class="form-input" onchange="filterRecords()">
+                        <option value="" data-i18n="allAreas">جميع المناطق</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-i18n="filterByProject">تصفية بالمشروع:</label>
+                    <select id="filterProject" class="form-input" onchange="filterRecords()">
+                        <option value="" data-i18n="allProjects">جميع المشاريع</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-i18n="searchPlate">بحث برقم اللوحة:</label>
+                    <input type="text" id="searchPlate" class="form-input" placeholder="ابحث برقم اللوحة..." onkeyup="filterRecords()">
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table" id="recordsTable">
+                    <thead>
+                        <tr>
+                            <th data-i18n="plateNumber">رقم اللوحة</th>
+                            <th data-i18n="area">المنطقة</th>
+                            <th data-i18n="previousProject">المشروع السابق</th>
+                            <th data-i18n="currentProject">المشروع الحالي</th>
+                            <th data-i18n="basicFuelQuota">حصة الوقود (لتر)</th>
+                            <th data-i18n="lastUpdate">آخر تحديث</th>
+                            <th data-i18n="updatedBy">محدث بواسطة</th>
+                            <th data-i18n="actions">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsBody">
+                        <!-- Records will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Admin Section -->
+        <div id="adminSection" class="content-section admin-only">
+            <h2 class="section-title">
+                <i class="fas fa-crown"></i>
+                <span data-i18n="adminPanel">لوحة تحكم المسؤول</span>
+            </h2>
+            
+            <!-- Pending Approvals -->
+            <h3 style="margin: 25px 0 20px; color: var(--warning); display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-user-clock"></i>
+                <span data-i18n="pendingApprovals">طلبات التسجيل قيد الانتظار</span>
+                <span class="status-badge status-pending" id="pendingCount">0</span>
+            </h3>
+            <div class="table-container">
+                <table class="data-table" id="pendingTable">
+                    <thead>
+                        <tr>
+                            <th data-i18n="username">اسم المستخدم</th>
+                            <th data-i18n="project">المشروع</th>
+                            <th data-i18n="area">المنطقة</th>
+                            <th data-i18n="registerDate">تاريخ التسجيل</th>
+                            <th data-i18n="actions">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendingBody">
+                        <!-- Pending approvals will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- All Users -->
+            <h3 style="margin: 40px 0 20px; color: var(--primary); display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-users"></i>
+                <span data-i18n="allUsers">جميع المستخدمين</span>
+                <span class="status-badge status-active" id="usersCount">0</span>
+            </h3>
+            <div class="table-container">
+                <table class="data-table" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th data-i18n="username">اسم المستخدم</th>
+                            <th data-i18n="project">المشروع</th>
+                            <th data-i18n="area">المنطقة</th>
+                            <th data-i18n="status">الحالة</th>
+                            <th data-i18n="lastLogin">آخر دخول</th>
+                            <th data-i18n="actions">الإجراءات</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersBody">
+                        <!-- Users will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="profileSection" class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-user-cog"></i>
+                <span data-i18n="updateProfile">تحديث الملف الشخصي</span>
+            </h2>
+            <form id="profileForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="username">اسم المستخدم</label>
+                        <input type="text" id="profileUsername" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="newPassword">كلمة مرور جديدة (اختياري)</label>
+                        <input type="password" id="profilePassword" class="form-input" placeholder="اتركه فارغاً إذا لم ترد التغيير">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="project">المشروع</label>
+                        <div class="project-selection">
+                            <div class="project-search">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="profileProjectSearch" placeholder="ابحث عن المشروع..." onkeyup="filterProfileProjects()">
+                            </div>
+                            <div class="projects-list" id="profileProjectsList">
+                                <!-- Profile projects will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <input type="hidden" id="profileProject">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="area">المنطقة</label>
+                        <select id="profileArea" class="form-input" required>
+                            <option value="" data-i18n="selectArea">اختر المنطقة</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="currentPassword">كلمة المرور الحالية (مطلوبة للتغيير)</label>
+                        <input type="password" id="currentPassword" class="form-input" placeholder="أدخل كلمة المرور الحالية للتأكيد">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-warning">
+                    <i class="fas fa-sync-alt"></i>
+                    <span data-i18n="updateProfileBtn">تحديث بيانات الحساب</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Dashboard Messages -->
+        <div id="dashboardMessage" class="message"></div>
+    </div>
+
+    <!-- Edit Vehicle Modal -->
+    <div id="editModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> <span data-i18n="editVehicle">تعديل بيانات المركبة</span></h2>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" id="editId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="plateNumber">رقم اللوحة</label>
+                            <input type="text" id="editPlate" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="area">المنطقة</label>
+                            <select id="editArea" class="form-input" required></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="previousProject">المشروع السابق</label>
+                            <div class="project-selection">
+                                <div class="project-search">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" id="editPrevProjectSearch" placeholder="ابحث عن المشروع السابق..." onkeyup="filterEditPrevProjects()">
+                                </div>
+                                <div class="projects-list" id="editPrevProjectsList" style="max-height: 200px;">
+                                    <!-- Edit previous projects will be populated by JavaScript -->
+                                </div>
+                            </div>
+                            <input type="hidden" id="editPrevProject">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="currentProject">المشروع الحالي</label>
+                            <div class="project-selection">
+                                <div class="project-search">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" id="editCurrProjectSearch" placeholder="ابحث عن المشروع الحالي..." onkeyup="filterEditCurrProjects()">
+                                </div>
+                                <div class="projects-list" id="editCurrProjectsList" style="max-height: 200px;">
+                                    <!-- Edit current projects will be populated by JavaScript -->
+                                </div>
+                            </div>
+                            <input type="hidden" id="editCurrProject">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="basicFuelQuota">حصة الوقود الأساسية (لتر)</label>
+                            <input type="number" id="editFuel" class="form-input" required min="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="additionalInfo">معلومات إضافية</label>
+                            <input type="text" id="editAdditionalInfo" class="form-input" placeholder="ملاحظات إضافية">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">تسجيل التحديث</label>
+                            <p style="color: #666; font-size: 0.95rem; padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                                <i class="fas fa-info-circle"></i>
+                                <span data-i18n="updateNote">سيتم تسجيل تاريخ ووقت التحديث تلقائياً مع اسم المستخدم الذي قام بالتحديث.</span>
+                            </p>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i>
+                        <span data-i18n="saveChanges">حفظ التعديلات</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyACA66gHN4i3fSKlon4hHx6_izNGKDdqWY",
+            authDomain: "syst-petro.firebaseapp.com",
+            databaseURL: "https://syst-petro-default-rtdb.firebaseio.com",
+            projectId: "syst-petro",
+            storageBucket: "syst-petro.firebasestorage.app",
+            messagingSenderId: "163734828682",
+            appId: "1:163734828682:web:9cec04f1d7a34da56e1f73"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Translation Object
+        const translations = {
+            ar: {
+                login: "تسجيل الدخول",
+                register: "تسجيل مشرف جديد",
+                username: "اسم المستخدم",
+                password: "كلمة المرور",
+                newPassword: "كلمة مرور جديدة",
+                currentPassword: "كلمة المرور الحالية",
+                project: "المشروع",
+                area: "المنطقة",
+                selectArea: "اختر المنطقة",
+                selectProject: "اختر المشروع",
+                logout: "تسجيل الخروج",
+                addVehicle: "إضافة مركبة جديدة",
+                addVehicleDesc: "إدخال بيانات مركبة جديدة يدوياً",
+                uploadExcel: "رفع ملف إكسل",
+                uploadExcelDesc: "رفع ملف إكسل يحتوي على بيانات مركبات",
+                viewRecords: "عرض جميع السجلات",
+                viewRecordsDesc: "عرض وتعديل سجلات المركبات",
+                adminPanel: "لوحة تحكم المسؤول",
+                adminPanelDesc: "إدارة المشرفين والصلاحيات",
+                updateProfile: "الملف الشخصي",
+                updateProfileDesc: "تحديث بيانات الحساب الشخصي",
+                vehicleEntry: "إدخال بيانات مركبة جديدة",
+                plateNumber: "رقم اللوحة",
+                previousProject: "المشروع السابق",
+                currentProject: "المشروع الحالي",
+                basicFuelQuota: "حصة الوقود الأساسية",
+                additionalInfo: "معلومات إضافية",
+                saveVehicle: "حفظ بيانات المركبة",
+                dropFile: "اسحب وأفلت ملف إكسل هنا",
+                clickToUpload: "أو انقر لاختيار الملف من الجهاز",
+                excelFormat: "يجب أن يحتوي الملف على الأعمدة التالية بالترتيب: رقم اللوحة، المشروع السابق، المشروع الحالي، المنطقة، حصة الوقود الأساسية",
+                previewData: "معاينة البيانات",
+                uploadData: "رفع البيانات إلى النظام",
+                vehicleRecords: "سجلات المركبات",
+                filterBy: "تصفية حسب:",
+                allAreas: "جميع المناطق",
+                filterByProject: "تصفية بالمشروع:",
+                allProjects: "جميع المشاريع",
+                searchPlate: "بحث برقم اللوحة:",
+                lastUpdate: "آخر تحديث",
+                updatedBy: "محدث بواسطة",
+                actions: "الإجراءات",
+                edit: "تعديل",
+                delete: "حذف",
+                approve: "موافقة",
+                view: "عرض",
+                update: "تحديث",
+                pendingApprovals: "طلبات التسجيل قيد الانتظار",
+                allUsers: "جميع المستخدمين",
+                status: "الحالة",
+                active: "نشط",
+                pending: "قيد الانتظار",
+                registerDate: "تاريخ التسجيل",
+                lastLogin: "آخر دخول",
+                editVehicle: "تعديل بيانات المركبة",
+                saveChanges: "حفظ التعديلات",
+                updateNote: "سيتم تسجيل تاريخ ووقت التحديث تلقائياً مع اسم المستخدم الذي قام بالتحديث.",
+                systemTitle: "نظام تحديث بيانات الوقود والمركبات",
+                admin: "مسؤول",
+                supervisor: "مشرف",
+                welcome: "مرحبا",
+                vehicleAdded: "تم إضافة المركبة بنجاح",
+                vehicleUpdated: "تم تحديث المركبة بنجاح",
+                vehicleDeleted: "تم حذف المركبة بنجاح",
+                userApproved: "تمت الموافقة على المستخدم",
+                userDeleted: "تم حذف المستخدم",
+                profileUpdated: "تم تحديث الملف الشخصي",
+                loginSuccess: "تم تسجيل الدخول بنجاح",
+                registerSuccess: "تم التسجيل بنجاح، انتظر موافقة المسؤول",
+                adminLogin: "المسؤول: هوندا | كلمة المرور: 0906212775",
+                excelUploaded: "تم رفع الملف بنجاح",
+                confirmDelete: "هل أنت متأكد من الحذف؟",
+                loginBtn: "دخول إلى النظام",
+                registerBtn: "تسجيل المشرف الجديد",
+                updateProfileBtn: "تحديث بيانات الحساب",
+                updateSuccess: "تم التحديث بنجاح",
+                excelDataUploaded: "تم رفع بيانات الإكسل بنجاح",
+                noExcelData: "لم يتم العثور على بيانات في ملف الإكسل",
+                invalidExcelFormat: "تنسيق ملف الإكسل غير صحيح",
+                filterResults: "نتائج التصفية",
+                clearFilter: "مسح التصفية",
+                deactivateUser: "تعطيل المستخدم",
+                activateUser: "تفعيل المستخدم",
+                lastUpdateTime: "وقت التحديث"
+            },
+            en: {
+                login: "Login",
+                register: "Register New Supervisor",
+                username: "Username",
+                password: "Password",
+                newPassword: "New Password",
+                currentPassword: "Current Password",
+                project: "Project",
+                area: "Area",
+                selectArea: "Select Area",
+                selectProject: "Select Project",
+                logout: "Logout",
+                addVehicle: "Add New Vehicle",
+                addVehicleDesc: "Manually enter new vehicle data",
+                uploadExcel: "Upload Excel File",
+                uploadExcelDesc: "Upload Excel file containing vehicle data",
+                viewRecords: "View All Records",
+                viewRecordsDesc: "View and modify vehicle records",
+                adminPanel: "Admin Control Panel",
+                adminPanelDesc: "Manage supervisors and permissions",
+                updateProfile: "Profile Settings",
+                updateProfileDesc: "Update account information",
+                vehicleEntry: "New Vehicle Entry",
+                plateNumber: "Plate Number",
+                previousProject: "Previous Project",
+                currentProject: "Current Project",
+                basicFuelQuota: "Basic Fuel Quota",
+                additionalInfo: "Additional Information",
+                saveVehicle: "Save Vehicle Data",
+                dropFile: "Drag & Drop Excel File Here",
+                clickToUpload: "Or click to select file from device",
+                excelFormat: "File must contain these columns in order: Plate Number, Previous Project, Current Project, Area, Basic Fuel Quota",
+                previewData: "Preview Data",
+                uploadData: "Upload Data to System",
+                vehicleRecords: "Vehicle Records",
+                filterBy: "Filter by:",
+                allAreas: "All Areas",
+                filterByProject: "Filter by Project:",
+                allProjects: "All Projects",
+                searchPlate: "Search by Plate:",
+                lastUpdate: "Last Update",
+                updatedBy: "Updated By",
+                actions: "Actions",
+                edit: "Edit",
+                delete: "Delete",
+                approve: "Approve",
+                view: "View",
+                update: "Update",
+                pendingApprovals: "Pending Registration Requests",
+                allUsers: "All Users",
+                status: "Status",
+                active: "Active",
+                pending: "Pending",
+                registerDate: "Registration Date",
+                lastLogin: "Last Login",
+                editVehicle: "Edit Vehicle Data",
+                saveChanges: "Save Changes",
+                updateNote: "Update date, time and username will be recorded automatically.",
+                systemTitle: "Vehicle Fuel Data Update System",
+                admin: "Admin",
+                supervisor: "Supervisor",
+                welcome: "Welcome",
+                vehicleAdded: "Vehicle added successfully",
+                vehicleUpdated: "Vehicle updated successfully",
+                vehicleDeleted: "Vehicle deleted successfully",
+                userApproved: "User approved successfully",
+                userDeleted: "User deleted successfully",
+                profileUpdated: "Profile updated successfully",
+                loginSuccess: "Login successful",
+                registerSuccess: "Registration successful, waiting for admin approval",
+                adminLogin: "Admin: Honda | Password: 0906212775",
+                excelUploaded: "File uploaded successfully",
+                confirmDelete: "Are you sure you want to delete?",
+                loginBtn: "Login to System",
+                registerBtn: "Register New Supervisor",
+                updateProfileBtn: "Update Account Data",
+                updateSuccess: "Updated successfully",
+                excelDataUploaded: "Excel data uploaded successfully",
+                noExcelData: "No data found in Excel file",
+                invalidExcelFormat: "Invalid Excel file format",
+                filterResults: "Filter Results",
+                clearFilter: "Clear Filter",
+                deactivateUser: "Deactivate User",
+                activateUser: "Activate User",
+                lastUpdateTime: "Update Time"
+            }
+        };
+
+        // Saudi Arabia Areas
+        const saudiAreas = [
+            "الرياض", "مكة المكرمة", "المدينة المنورة", "الدمام", "الخبر",
+            "جدة", "الطائف", "تبوك", "حائل", "بريدة",
+            "سكاكا", "أبها", "جازان", "نجران", "الباحة",
+            "عرعر", "القريات", "الجبيل", "ينبع", "رابغ"
+        ];
+
+        // List of Projects with areas
+        const projectsList = [
+            { name: "المراعي", area: "الرياض" },
+            { name: "ارامكس", area: "الرياض" },
+            { name: "كيمارت دبابات", area: "الدمام" },
+            { name: "نينجا دبابات", area: "الدمام" },
+            { name: "كيمارت", area: "الدمام" },
+            { name: "سلاسه", area: "الدمام" },
+            { name: "سلاسه", area: "الرياض" },
+            { name: "الببسي", area: "الرياض" },
+            { name: "6 ستريت", area: "الرياض" },
+            { name: "نون مينيتس", area: "الرياض" },
+            { name: "فيديكس", area: "الرياض" },
+            { name: "ملهم", area: "الرياض" },
+            { name: "ناقل سبل", area: "الرياض" },
+            { name: "ناقل جاف", area: "الرياض" },
+            { name: "كيمارت", area: "الرياض" },
+            { name: "فرست كراي", area: "الرياض" },
+            { name: "لاند مارك", area: "الرياض" },
+            { name: "نون 3 بي ال", area: "الرياض" },
+            { name: "ترانسكورب", area: "الرياض" },
+            { name: "فيدكس", area: "الرياض" },
+            { name: "اتا", area: "حائل" },
+            { name: "امازون", area: "مكة" },
+            { name: "بندا", area: "مكة" },
+            { name: "مستودعات الزهراني", area: "الرياض" },
+            { name: "كي مارت", area: "تبوك" },
+            { name: "استارلنك", area: "تبوك" },
+            { name: "ناقل", area: "الرياض" },
+            { name: "كيتا", area: "الأحساء" },
+            { name: "كيتا", area: "مكة" },
+            { name: "نينجا كيتا", area: "الدمام" },
+            { name: "كيتا", area: "الدمام" },
+            { name: "كيتا", area: "المدينة المنورة" },
+            { name: "كيتا", area: "جدة" },
+            { name: "شيبا", area: "جازان" },
+            { name: "فلو 6 استريت", area: "الرياض" },
+            { name: "فيرستكراى", area: "الرياض" },
+            { name: "كيتا", area: "الرياض" },
+            { name: "نابكو", area: "الرياض" },
+            { name: "لاندمارك", area: "الرياض" },
+            { name: "نون-3 بي ال", area: "الرياض" },
+            { name: "اى مكان", area: "الرياض" },
+            { name: "سلاسة", area: "الرياض" },
+            { name: "الدانة", area: "الرياض" }
+        ];
+
+        let currentUser = null;
+        let currentLanguage = 'ar';
+        let excelData = [];
+        let selectedProject = '';
+
+        // Initialize the application
+        function initApp() {
+            loadAreas();
+            loadProjectsLists();
+            checkAuth();
+            setupEventListeners();
+            setupDragAndDrop();
+            updateTranslations();
+        }
+
+        // Load Saudi areas to all select elements
+        function loadAreas() {
+            const areaSelects = ['regArea', 'vehicleArea', 'profileArea', 'editArea', 'filterArea'];
+            areaSelects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = `<option value="" data-i18n="selectArea">${translate('selectArea')}</option>`;
+                    saudiAreas.forEach(area => {
+                        const option = document.createElement('option');
+                        option.value = area;
+                        option.textContent = area;
+                        select.appendChild(option);
+                    });
+                }
+            });
+        }
+
+        // Load projects to all project lists
+        function loadProjectsLists() {
+            const projectLists = [
+                'projectsList', 'prevProjectsList', 'currProjectsList', 
+                'profileProjectsList', 'editPrevProjectsList', 'editCurrProjectsList'
+            ];
+            
+            projectLists.forEach(listId => {
+                const list = document.getElementById(listId);
+                if (list) {
+                    renderProjectsList(list, '', listId);
+                }
+            });
+        }
+
+        // Render projects list
+        function renderProjectsList(container, searchTerm = '', listType = '') {
+            container.innerHTML = '';
+            
+            let filteredProjects = projectsList;
+            
+            if (searchTerm) {
+                filteredProjects = projectsList.filter(project => 
+                    project.name.includes(searchTerm) || 
+                    project.area.includes(searchTerm)
+                );
+            }
+            
+            filteredProjects.forEach(project => {
+                const item = document.createElement('div');
+                item.className = 'project-item';
+                item.innerHTML = `
+                    <span>${project.name}</span>
+                    <span class="project-area">${project.area}</span>
+                `;
+                
+                item.onclick = () => {
+                    // Remove selection from all items in this container
+                    container.querySelectorAll('.project-item').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    
+                    // Add selection to clicked item
+                    item.classList.add('selected');
+                    
+                    // Store selected project based on list type
+                    if (listType === 'projectsList') {
+                        selectedProject = project.name;
+                        document.getElementById('regProject').value = project.name;
+                    } else if (listType === 'prevProjectsList') {
+                        document.getElementById('previousProject').value = project.name;
+                    } else if (listType === 'currProjectsList') {
+                        document.getElementById('currentProject').value = project.name;
+                    } else if (listType === 'profileProjectsList') {
+                        document.getElementById('profileProject').value = project.name;
+                    } else if (listType === 'editPrevProjectsList') {
+                        document.getElementById('editPrevProject').value = project.name;
+                    } else if (listType === 'editCurrProjectsList') {
+                        document.getElementById('editCurrProject').value = project.name;
+                    }
+                };
+                
+                container.appendChild(item);
+            });
+            
+            if (filteredProjects.length === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'project-item';
+                noResults.innerHTML = '<span style="color: #666;">لا توجد نتائج</span>';
+                container.appendChild(noResults);
+            }
+        }
+
+        // Filter functions for different project lists
+        function filterProjects() {
+            const searchTerm = document.getElementById('projectSearch').value;
+            const list = document.getElementById('projectsList');
+            renderProjectsList(list, searchTerm, 'projectsList');
+        }
+
+        function filterPrevProjects() {
+            const searchTerm = document.getElementById('prevProjectSearch').value;
+            const list = document.getElementById('prevProjectsList');
+            renderProjectsList(list, searchTerm, 'prevProjectsList');
+        }
+
+        function filterCurrProjects() {
+            const searchTerm = document.getElementById('currProjectSearch').value;
+            const list = document.getElementById('currProjectsList');
+            renderProjectsList(list, searchTerm, 'currProjectsList');
+        }
+
+        function filterProfileProjects() {
+            const searchTerm = document.getElementById('profileProjectSearch').value;
+            const list = document.getElementById('profileProjectsList');
+            renderProjectsList(list, searchTerm, 'profileProjectsList');
+        }
+
+        function filterEditPrevProjects() {
+            const searchTerm = document.getElementById('editPrevProjectSearch').value;
+            const list = document.getElementById('editPrevProjectsList');
+            renderProjectsList(list, searchTerm, 'editPrevProjectsList');
+        }
+
+        function filterEditCurrProjects() {
+            const searchTerm = document.getElementById('editCurrProjectSearch').value;
+            const list = document.getElementById('editCurrProjectsList');
+            renderProjectsList(list, searchTerm, 'editCurrProjectsList');
+        }
+
+        // Change language
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            
+            // Update language buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-lang') === lang) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            updateTranslations();
+        }
+
+        // Translate text
+        function translate(key) {
+            return translations[currentLanguage][key] || key;
+        }
+
+        // Update all translatable elements
+        function updateTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (element.tagName === 'INPUT' || element.tagName === 'SELECT') {
+                    element.placeholder = translate(key);
+                } else {
+                    element.textContent = translate(key);
+                }
+            });
+        }
+
+        // Show auth form
+        function showAuthForm(form) {
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.auth-form').forEach(formEl => {
+                formEl.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+            document.getElementById(form + 'Form').classList.add('active');
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = document.getElementById('loginUsername').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                // Check for admin login
+                if (username === 'هوندا' && password === '0906212775') {
+                    currentUser = {
+                        username: 'هوندا',
+                        role: 'admin',
+                        project: 'System Administrator',
+                        area: 'All Areas',
+                        status: 'active'
+                    };
+                    showMessage('authMessage', translate('adminLogin'), 'info');
+                    setTimeout(() => {
+                        showDashboard();
+                        showMessage('dashboardMessage', translate('loginSuccess'), 'success');
+                    }, 1000);
+                    return;
+                }
+                
+                // Check regular users
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.once('value');
+                const users = snapshot.val();
+                
+                if (users) {
+                    const userKey = Object.keys(users).find(key => 
+                        users[key].username === username && 
+                        users[key].password === password
+                    );
+                    
+                    if (userKey) {
+                        const user = users[userKey];
+                        if (user.status === 'active') {
+                            // Update last login time
+                            await database.ref('users/' + userKey).update({
+                                lastLogin: new Date().toISOString()
+                            });
+                            
+                            currentUser = { ...user, id: userKey };
+                            showDashboard();
+                            showMessage('dashboardMessage', translate('loginSuccess'), 'success');
+                        } else {
+                            showMessage('authMessage', translate('pendingApproval'), 'error');
+                        }
+                    } else {
+                        showMessage('authMessage', translate('invalidCredentials'), 'error');
+                    }
+                } else {
+                    showMessage('authMessage', translate('noUsers'), 'error');
+                }
+            });
+
+            // Register form
+            document.getElementById('registerForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if (!selectedProject) {
+                    showMessage('authMessage', 'الرجاء اختيار مشروع', 'error');
+                    return;
+                }
+                
+                const user = {
+                    username: document.getElementById('regUsername').value,
+                    password: document.getElementById('regPassword').value,
+                    project: selectedProject,
+                    area: document.getElementById('regArea').value,
+                    role: 'supervisor',
+                    status: 'pending',
+                    createdAt: new Date().toISOString(),
+                    lastLogin: null
+                };
+                
+                const usersRef = database.ref('users');
+                await usersRef.push(user);
+                
+                showMessage('authMessage', translate('registerSuccess'), 'success');
+                document.getElementById('registerForm').reset();
+                selectedProject = '';
+                // Clear project selection
+                document.getElementById('projectsList').querySelectorAll('.project-item').forEach(el => {
+                    el.classList.remove('selected');
+                });
+                showAuthForm('login');
+            });
+
+            // Vehicle form
+            document.getElementById('vehicleForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const prevProject = document.getElementById('previousProject').value;
+                const currProject = document.getElementById('currentProject').value;
+                
+                if (!prevProject || !currProject) {
+                    showMessage('dashboardMessage', 'الرجاء اختيار المشروع السابق والحالي', 'error');
+                    return;
+                }
+                
+                const now = new Date();
+                const vehicle = {
+                    plateNumber: document.getElementById('plateNumber').value,
+                    area: document.getElementById('vehicleArea').value,
+                    previousProject: prevProject,
+                    currentProject: currProject,
+                    basicFuelQuota: document.getElementById('fuelQuota').value,
+                    additionalInfo: document.getElementById('additionalInfo').value || '',
+                    createdBy: currentUser.username,
+                    createdAt: now.toISOString(),
+                    lastUpdatedBy: currentUser.username,
+                    lastUpdatedAt: now.toISOString(),
+                    updateHistory: [{
+                        updatedBy: currentUser.username,
+                        updatedAt: now.toISOString(),
+                        changes: "Initial creation"
+                    }]
+                };
+                
+                const vehiclesRef = database.ref('vehicles');
+                await vehiclesRef.push(vehicle);
+                
+                showMessage('dashboardMessage', translate('vehicleAdded'), 'success');
+                document.getElementById('vehicleForm').reset();
+                // Clear project selections
+                ['prevProjectsList', 'currProjectsList'].forEach(listId => {
+                    document.getElementById(listId).querySelectorAll('.project-item').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                });
+                document.getElementById('previousProject').value = '';
+                document.getElementById('currentProject').value = '';
+                loadVehicleRecords();
+            });
+
+            // Profile form
+            document.getElementById('profileForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const currentPassword = document.getElementById('currentPassword').value;
+                const newPassword = document.getElementById('profilePassword').value;
+                const selectedProfileProject = document.getElementById('profileProject').value;
+                
+                // Verify current password
+                if (currentUser.password !== currentPassword && currentUser.username !== 'هوندا') {
+                    showMessage('dashboardMessage', translate('incorrectPassword'), 'error');
+                    return;
+                }
+                
+                const updates = {
+                    username: document.getElementById('profileUsername').value,
+                    project: selectedProfileProject || currentUser.project,
+                    area: document.getElementById('profileArea').value
+                };
+                
+                if (newPassword) {
+                    updates.password = newPassword;
+                }
+                
+                const userRef = database.ref('users/' + currentUser.id);
+                await userRef.update(updates);
+                
+                currentUser = { ...currentUser, ...updates };
+                updateUserInfo();
+                showMessage('dashboardMessage', translate('profileUpdated'), 'success');
+            });
+
+            // Edit form
+            document.getElementById('editForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const now = new Date();
+                const vehicleId = document.getElementById('editId').value;
+                const editPrevProject = document.getElementById('editPrevProject').value;
+                const editCurrProject = document.getElementById('editCurrProject').value;
+                
+                if (!editPrevProject || !editCurrProject) {
+                    showMessage('dashboardMessage', 'الرجاء اختيار المشروع السابق والحالي', 'error');
+                    return;
+                }
+                
+                // Get current vehicle data
+                const vehicleRef = database.ref('vehicles/' + vehicleId);
+                const snapshot = await vehicleRef.once('value');
+                const currentVehicle = snapshot.val();
+                
+                // Prepare updates
+                const updates = {
+                    plateNumber: document.getElementById('editPlate').value,
+                    area: document.getElementById('editArea').value,
+                    previousProject: editPrevProject,
+                    currentProject: editCurrProject,
+                    basicFuelQuota: document.getElementById('editFuel').value,
+                    additionalInfo: document.getElementById('editAdditionalInfo').value || '',
+                    lastUpdatedBy: currentUser.username,
+                    lastUpdatedAt: now.toISOString()
+                };
+                
+                // Add to update history
+                const updateEntry = {
+                    updatedBy: currentUser.username,
+                    updatedAt: now.toISOString(),
+                    changes: `Updated by ${currentUser.username}`
+                };
+                
+                const updateHistory = currentVehicle.updateHistory || [];
+                updateHistory.push(updateEntry);
+                updates.updateHistory = updateHistory;
+                
+                await vehicleRef.update(updates);
+                
+                closeModal();
+                showMessage('dashboardMessage', translate('vehicleUpdated'), 'success');
+                loadVehicleRecords();
+            });
+        }
+
+        // Setup drag and drop for Excel upload
+        function setupDragAndDrop() {
+            const dropArea = document.getElementById('excelDropArea');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                dropArea.style.borderColor = 'var(--primary)';
+                dropArea.style.background = 'rgba(26, 35, 126, 0.05)';
+            }
+            
+            function unhighlight() {
+                dropArea.style.borderColor = '#bdbdbd';
+                dropArea.style.background = '#f9f9f9';
+            }
+            
+            dropArea.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleExcelFiles(files);
+            }
+        }
+
+        // Handle Excel file selection
+        function handleExcelFileSelect(event) {
+            const files = event.target.files;
+            handleExcelFiles(files);
+        }
+
+        // Handle Excel files
+        function handleExcelFiles(files) {
+            if (files.length === 0) return;
+            
+            const file = files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    // Parse Excel file (simulated for this example)
+                    // In real implementation, use SheetJS or similar library
+                    const data = e.target.result;
+                    parseExcelData(data);
+                } catch (error) {
+                    showMessage('dashboardMessage', translate('invalidExcelFormat'), 'error');
+                    console.error('Excel parsing error:', error);
+                }
+            };
+            
+            reader.readAsBinaryString(file);
+        }
+
+        // Parse Excel data (simulated)
+        function parseExcelData(data) {
+            // Simulated Excel data parsing
+            // In real implementation, this would parse actual Excel file
+            excelData = [
+                {
+                    plateNumber: 'أ ب ج 1234',
+                    previousProject: 'ارامكس',
+                    currentProject: 'كيمارت',
+                    area: 'الرياض',
+                    basicFuelQuota: '500'
+                },
+                {
+                    plateNumber: 'د هـ و 5678',
+                    previousProject: 'المراعي',
+                    currentProject: 'الببسي',
+                    area: 'الرياض',
+                    basicFuelQuota: '750'
+                },
+                {
+                    plateNumber: 'ز ح ط 9012',
+                    previousProject: 'كيمارت دبابات',
+                    currentProject: 'فيديكس',
+                    area: 'الدمام',
+                    basicFuelQuota: '600'
+                }
+            ];
+            
+            showExcelPreview();
+        }
+
+        // Show Excel preview
+        function showExcelPreview() {
+            const previewBody = document.getElementById('excelPreviewBody');
+            previewBody.innerHTML = '';
+            
+            excelData.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.plateNumber}</td>
+                    <td>${row.previousProject}</td>
+                    <td>${row.currentProject}</td>
+                    <td>${row.area}</td>
+                    <td>${row.basicFuelQuota}</td>
+                `;
+                previewBody.appendChild(tr);
+            });
+            
+            document.getElementById('excelPreview').style.display = 'block';
+            showMessage('dashboardMessage', translate('excelUploaded'), 'success');
+        }
+
+        // Upload Excel data to Firebase
+        async function uploadExcelData() {
+            const now = new Date();
+            
+            for (const vehicle of excelData) {
+                const vehicleData = {
+                    ...vehicle,
+                    createdBy: currentUser.username,
+                    createdAt: now.toISOString(),
+                    lastUpdatedBy: currentUser.username,
+                    lastUpdatedAt: now.toISOString(),
+                    updateHistory: [{
+                        updatedBy: currentUser.username,
+                        updatedAt: now.toISOString(),
+                        changes: "Uploaded via Excel"
+                    }]
+                };
+                
+                const vehiclesRef = database.ref('vehicles');
+                await vehiclesRef.push(vehicleData);
+            }
+            
+            showMessage('dashboardMessage', translate('excelDataUploaded'), 'success');
+            document.getElementById('excelPreview').style.display = 'none';
+            document.getElementById('excelFileInput').value = '';
+            excelData = [];
+            loadVehicleRecords();
+        }
+
+        // Show message
+        function showMessage(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            element.className = `message ${type}`;
+            element.style.display = 'flex';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        // Show dashboard
+        function showDashboard() {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            updateUserInfo();
+            loadVehicleRecords();
+            
+            // Show/hide admin features
+            const adminElements = document.querySelectorAll('.admin-only');
+            if (currentUser.role === 'admin') {
+                adminElements.forEach(el => el.style.display = 'block');
+                loadPendingApprovals();
+                loadAllUsers();
+            } else {
+                adminElements.forEach(el => el.style.display = 'none');
+            }
+            
+            // Show vehicle section by default
+            showSection('vehicleSection');
+        }
+
+        // Update user info display
+        function updateUserInfo() {
+            document.getElementById('userName').textContent = 
+                `${translate('welcome')} ${currentUser.username}`;
+            document.getElementById('userRole').textContent = 
+                `${translate(currentUser.role)}`;
+            document.getElementById('userProject').textContent = 
+                currentUser.project || '';
+            document.getElementById('userArea').textContent = 
+                currentUser.area || '';
+            
+            // Update profile form
+            document.getElementById('profileUsername').value = currentUser.username;
+            document.getElementById('profileProject').value = currentUser.project || '';
+            document.getElementById('profileArea').value = currentUser.area || '';
+            
+            // Set selected project in profile
+            if (currentUser.project) {
+                setTimeout(() => {
+                    const profileList = document.getElementById('profileProjectsList');
+                    profileList.querySelectorAll('.project-item').forEach(item => {
+                        if (item.querySelector('span').textContent === currentUser.project) {
+                            item.classList.add('selected');
+                        }
+                    });
+                }, 100);
+            }
+        }
+
+        // Show section
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Load vehicle records
+        async function loadVehicleRecords() {
+            const recordsBody = document.getElementById('recordsBody');
+            recordsBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;">جارٍ تحميل السجلات...</td></tr>';
+            
+            const vehiclesRef = database.ref('vehicles');
+            const snapshot = await vehiclesRef.once('value');
+            const vehicles = snapshot.val();
+            
+            recordsBody.innerHTML = '';
+            
+            if (vehicles) {
+                Object.keys(vehicles).forEach(key => {
+                    const vehicle = vehicles[key];
+                    const lastUpdate = vehicle.lastUpdatedAt ? 
+                        new Date(vehicle.lastUpdatedAt).toLocaleString('ar-SA') : 
+                        new Date(vehicle.createdAt).toLocaleString('ar-SA');
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${vehicle.plateNumber}</strong></td>
+                        <td>${vehicle.area}</td>
+                        <td>${vehicle.previousProject}</td>
+                        <td>${vehicle.currentProject}</td>
+                        <td>${vehicle.basicFuelQuota} لتر</td>
+                        <td><span class="timestamp-cell">${lastUpdate}</span></td>
+                        <td>${vehicle.lastUpdatedBy || vehicle.createdBy}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn update-btn" onclick="editVehicle('${key}')">
+                                    <i class="fas fa-edit"></i> ${translate('update')}
+                                </button>
+                                ${currentUser.role === 'admin' ? `
+                                    <button class="action-btn delete-btn" onclick="deleteVehicle('${key}')">
+                                        <i class="fas fa-trash"></i> ${translate('delete')}
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    `;
+                    recordsBody.appendChild(row);
+                });
+            } else {
+                recordsBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;">لا توجد سجلات مركبات</td></tr>';
+            }
+            
+            // Update filter dropdowns
+            updateFilterDropdowns(vehicles);
+        }
+
+        // Update filter dropdowns with unique values
+        function updateFilterDropdowns(vehicles) {
+            const areaFilter = document.getElementById('filterArea');
+            const projectFilter = document.getElementById('filterProject');
+            
+            // Collect unique areas and projects
+            const areas = new Set();
+            const projects = new Set();
+            
+            if (vehicles) {
+                Object.values(vehicles).forEach(vehicle => {
+                    if (vehicle.area) areas.add(vehicle.area);
+                    if (vehicle.currentProject) projects.add(vehicle.currentProject);
+                    if (vehicle.previousProject) projects.add(vehicle.previousProject);
+                });
+            }
+            
+            // Add areas to filter
+            areas.forEach(area => {
+                if (!Array.from(areaFilter.options).some(opt => opt.value === area)) {
+                    const option = document.createElement('option');
+                    option.value = area;
+                    option.textContent = area;
+                    areaFilter.appendChild(option);
+                }
+            });
+            
+            // Add projects to filter
+            projects.forEach(project => {
+                if (!Array.from(projectFilter.options).some(opt => opt.value === project)) {
+                    const option = document.createElement('option');
+                    option.value = project;
+                    option.textContent = project;
+                    projectFilter.appendChild(option);
+                }
+            });
+        }
+
+        // Filter records
+        function filterRecords() {
+            const areaFilter = document.getElementById('filterArea').value;
+            const projectFilter = document.getElementById('filterProject').value;
+            const searchText = document.getElementById('searchPlate').value.toLowerCase();
+            
+            const rows = document.querySelectorAll('#recordsBody tr');
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length < 7) return;
+                
+                const area = cells[1].textContent;
+                const project = cells[3].textContent;
+                const plate = cells[0].textContent.toLowerCase();
+                
+                const areaMatch = !areaFilter || area === areaFilter;
+                const projectMatch = !projectFilter || project === projectFilter;
+                const searchMatch = !searchText || plate.includes(searchText);
+                
+                row.style.display = areaMatch && projectMatch && searchMatch ? '' : 'none';
+            });
+        }
+
+        // Edit vehicle
+        async function editVehicle(vehicleId) {
+            const vehicleRef = database.ref('vehicles/' + vehicleId);
+            const snapshot = await vehicleRef.once('value');
+            const vehicle = snapshot.val();
+            
+            document.getElementById('editId').value = vehicleId;
+            document.getElementById('editPlate').value = vehicle.plateNumber || '';
+            document.getElementById('editFuel').value = vehicle.basicFuelQuota || '';
+            document.getElementById('editAdditionalInfo').value = vehicle.additionalInfo || '';
+            
+            // Load areas in edit modal
+            const areaSelect = document.getElementById('editArea');
+            areaSelect.innerHTML = `<option value="" data-i18n="selectArea">${translate('selectArea')}</option>`;
+            saudiAreas.forEach(area => {
+                const option = document.createElement('option');
+                option.value = area;
+                option.textContent = area;
+                areaSelect.appendChild(option);
+            });
+            areaSelect.value = vehicle.area || '';
+            
+            // Set project values in hidden inputs
+            document.getElementById('editPrevProject').value = vehicle.previousProject || '';
+            document.getElementById('editCurrProject').value = vehicle.currentProject || '';
+            
+            // Select projects in lists
+            setTimeout(() => {
+                const editPrevList = document.getElementById('editPrevProjectsList');
+                const editCurrList = document.getElementById('editCurrProjectsList');
+                
+                if (editPrevList) {
+                    editPrevList.querySelectorAll('.project-item').forEach(item => {
+                        if (item.querySelector('span').textContent === vehicle.previousProject) {
+                            item.classList.add('selected');
+                        }
+                    });
+                }
+                
+                if (editCurrList) {
+                    editCurrList.querySelectorAll('.project-item').forEach(item => {
+                        if (item.querySelector('span').textContent === vehicle.currentProject) {
+                            item.classList.add('selected');
+                        }
+                    });
+                }
+            }, 100);
+            
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        // Delete vehicle
+        async function deleteVehicle(vehicleId) {
+            if (confirm(translate('confirmDelete'))) {
+                const vehicleRef = database.ref('vehicles/' + vehicleId);
+                await vehicleRef.remove();
+                showMessage('dashboardMessage', translate('vehicleDeleted'), 'success');
+                loadVehicleRecords();
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Load pending approvals (admin only)
+        async function loadPendingApprovals() {
+            const pendingBody = document.getElementById('pendingBody');
+            pendingBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px;">جارٍ التحميل...</td></tr>';
+            
+            const usersRef = database.ref('users');
+            const snapshot = await usersRef.once('value');
+            const users = snapshot.val();
+            
+            pendingBody.innerHTML = '';
+            let pendingCount = 0;
+            
+            if (users) {
+                Object.keys(users).forEach(key => {
+                    const user = users[key];
+                    if (user.status === 'pending' && user.role === 'supervisor') {
+                        pendingCount++;
+                        const registerDate = user.createdAt ? 
+                            new Date(user.createdAt).toLocaleDateString('ar-SA') : 'غير معروف';
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td><strong>${user.username}</strong></td>
+                            <td>${user.project}</td>
+                            <td>${user.area}</td>
+                            <td>${registerDate}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn approve-btn" onclick="approveUser('${key}')">
+                                        <i class="fas fa-check"></i> ${translate('approve')}
+                                    </button>
+                                    <button class="action-btn delete-btn" onclick="deleteUser('${key}')">
+                                        <i class="fas fa-trash"></i> ${translate('delete')}
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        pendingBody.appendChild(row);
+                    }
+                });
+            }
+            
+            document.getElementById('pendingCount').textContent = pendingCount;
+            
+            if (pendingCount === 0) {
+                pendingBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;">لا توجد طلبات معلقة</td></tr>';
+            }
+        }
+
+        // Load all users (admin only)
+        async function loadAllUsers() {
+            const usersBody = document.getElementById('usersBody');
+            usersBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 30px;">جارٍ التحميل...</td></tr>';
+            
+            const usersRef = database.ref('users');
+            const snapshot = await usersRef.once('value');
+            const users = snapshot.val();
+            
+            usersBody.innerHTML = '';
+            let usersCount = 0;
+            
+            if (users) {
+                Object.keys(users).forEach(key => {
+                    const user = users[key];
+                    if (user.username !== 'هوندا') { // Don't show admin in list
+                        usersCount++;
+                        const lastLogin = user.lastLogin ? 
+                            new Date(user.lastLogin).toLocaleString('ar-SA') : 'لم يسجل دخول';
+                        const statusClass = user.status === 'active' ? 'status-active' : 
+                                           user.status === 'pending' ? 'status-pending' : 'status-inactive';
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td><strong>${user.username}</strong></td>
+                            <td>${user.project}</td>
+                            <td>${user.area}</td>
+                            <td><span class="status-badge ${statusClass}">${translate(user.status)}</span></td>
+                            <td>${lastLogin}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    ${user.status === 'pending' ? `
+                                        <button class="action-btn approve-btn" onclick="approveUser('${key}')">
+                                            <i class="fas fa-check"></i> ${translate('approve')}
+                                        </button>
+                                    ` : user.status === 'active' ? `
+                                        <button class="action-btn delete-btn" onclick="deactivateUser('${key}')">
+                                            <i class="fas fa-user-slash"></i> ${translate('deactivateUser')}
+                                        </button>
+                                    ` : `
+                                        <button class="action-btn approve-btn" onclick="activateUser('${key}')">
+                                            <i class="fas fa-user-check"></i> ${translate('activateUser')}
+                                        </button>
+                                    `}
+                                    <button class="action-btn delete-btn" onclick="deleteUser('${key}')">
+                                        <i class="fas fa-trash"></i> ${translate('delete')}
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        usersBody.appendChild(row);
+                    }
+                });
+            }
+            
+            document.getElementById('usersCount').textContent = usersCount;
+            
+            if (usersCount === 0) {
+                usersBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">لا يوجد مستخدمون مسجلون</td></tr>';
+            }
+        }
+
+        // Approve user (admin only)
+        async function approveUser(userId) {
+            const userRef = database.ref('users/' + userId);
+            await userRef.update({ 
+                status: 'active',
+                approvedAt: new Date().toISOString(),
+                approvedBy: currentUser.username
+            });
+            showMessage('dashboardMessage', translate('userApproved'), 'success');
+            loadPendingApprovals();
+            loadAllUsers();
+        }
+
+        // Deactivate user (admin only)
+        async function deactivateUser(userId) {
+            if (confirm(translate('confirmDeactivate'))) {
+                const userRef = database.ref('users/' + userId);
+                await userRef.update({ status: 'inactive' });
+                showMessage('dashboardMessage', translate('userDeactivated'), 'success');
+                loadAllUsers();
+            }
+        }
+
+        // Activate user (admin only)
+        async function activateUser(userId) {
+            const userRef = database.ref('users/' + userId);
+            await userRef.update({ status: 'active' });
+            showMessage('dashboardMessage', translate('userActivated'), 'success');
+            loadAllUsers();
+        }
+
+        // Delete user (admin only)
+        async function deleteUser(userId) {
+            if (confirm(translate('confirmDelete'))) {
+                const userRef = database.ref('users/' + userId);
+                await userRef.remove();
+                showMessage('dashboardMessage', translate('userDeleted'), 'success');
+                loadPendingApprovals();
+                loadAllUsers();
+            }
+        }
+
+        // Check authentication state
+        function checkAuth() {
+            // Check if user was previously logged in (for session persistence)
+            const savedUser = localStorage.getItem('petroweb_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showDashboard();
+            }
+        }
+
+        // Logout
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('petroweb_user');
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('authContainer').style.display = 'flex';
+            document.getElementById('loginForm').reset();
+            document.getElementById('registerForm').reset();
+        }
+
+        // Initialize when page loads
+        window.onload = initApp;
+    </script>
+</body>
+</html>
