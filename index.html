@@ -822,6 +822,13 @@
             border-bottom: 1px solid #eee;
         }
 
+        /* Excel Upload Buttons */
+        .excel-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -1189,10 +1196,16 @@
             <div class="excel-preview" id="excelPreview" style="display: none;">
                 <div class="preview-title">
                     <h3><i class="fas fa-table"></i> <span data-i18n="previewData">معاينة البيانات</span></h3>
-                    <button class="btn btn-success" onclick="uploadExcelData()">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <span data-i18n="uploadData">رفع البيانات إلى النظام</span>
-                    </button>
+                    <div class="excel-actions">
+                        <button class="btn btn-success" onclick="uploadExcelData()">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span data-i18n="uploadData">رفع البيانات إلى النظام</span>
+                        </button>
+                        <button class="btn btn-warning" onclick="updateExcelData()">
+                            <i class="fas fa-sync-alt"></i>
+                            <span data-i18n="updateData">تحديث البيانات الموجودة</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="table-container">
                     <table class="data-table" id="excelPreviewTable">
@@ -1203,6 +1216,7 @@
                                 <th data-i18n="currentProject">المشروع الحالي</th>
                                 <th data-i18n="area">المنطقة</th>
                                 <th data-i18n="basicFuelQuota">حصة الوقود (ريال)</th>
+                                <th data-i18n="action">الإجراء</th>
                             </tr>
                         </thead>
                         <tbody id="excelPreviewBody">
@@ -1277,6 +1291,7 @@
                     <thead>
                         <tr>
                             <th data-i18n="username">اسم المستخدم</th>
+                            <th data-i18n="password">كلمة المرور</th>
                             <th data-i18n="project">المشروع</th>
                             <th data-i18n="area">المنطقة</th>
                             <th data-i18n="registerDate">تاريخ التسجيل</th>
@@ -1300,15 +1315,54 @@
                     <thead>
                         <tr>
                             <th data-i18n="username">اسم المستخدم</th>
+                            <th data-i18n="password">كلمة المرور</th>
                             <th data-i18n="project">المشروع</th>
                             <th data-i18n="area">المنطقة</th>
                             <th data-i18n="status">الحالة</th>
                             <th data-i18n="lastLogin">آخر دخول</th>
-                            <th data-i18n="actions">الإجراءات</span></th>
+                            <th data-i18n="actions">الإجراءات</th>
                         </tr>
                     </thead>
                     <tbody id="usersBody">
                         <!-- Users will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- User Vehicle Data -->
+            <h3 style="margin: 40px 0 20px; color: var(--info); display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-truck"></i>
+                <span data-i18n="userVehicleData">بيانات المركبات للمستخدمين</span>
+                <span class="status-badge status-active" id="vehicleDataCount">0</span>
+            </h3>
+            <div class="form-row" style="margin-bottom: 20px;">
+                <div class="form-group">
+                    <label class="form-label" data-i18n="filterByUser">تصفية بالمستخدم:</label>
+                    <select id="filterUserVehicles" class="form-input" onchange="filterUserVehicleData()">
+                        <option value="" data-i18n="allUsers">جميع المستخدمين</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-i18n="filterByDate">تصفية بالتاريخ:</label>
+                    <input type="date" id="filterDate" class="form-input" onchange="filterUserVehicleData()">
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table" id="userVehicleDataTable">
+                    <thead>
+                        <tr>
+                            <th data-i18n="username">اسم المستخدم</th>
+                            <th data-i18n="plateNumber">رقم اللوحة</th>
+                            <th data-i18n="area">المنطقة</th>
+                            <th data-i18n="previousProject">المشروع السابق</th>
+                            <th data-i18n="currentProject">المشروع الحالي</th>
+                            <th data-i18n="basicFuelQuota">حصة الوقود</th>
+                            <th data-i18n="lastUpdate">آخر تحديث</th>
+                            <th data-i18n="updateHistory">سجل التحديثات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userVehicleDataBody">
+                        <!-- User vehicle data will be loaded here -->
                     </tbody>
                 </table>
             </div>
@@ -1512,6 +1566,10 @@
                 excelFormat: "يجب أن يحتوي الملف على الأعمدة التالية بالترتيب: رقم اللوحة، المشروع السابق، المشروع الحالي، المنطقة، حصة الوقود الأساسية (ريال)",
                 previewData: "معاينة البيانات",
                 uploadData: "رفع البيانات إلى النظام",
+                updateData: "تحديث البيانات الموجودة",
+                action: "الإجراء",
+                newEntry: "إدخال جديد",
+                updateExisting: "تحديث موجود",
                 
                 // Records
                 vehicleRecords: "سجلات المركبات",
@@ -1539,6 +1597,10 @@
                 pending: "قيد الانتظار",
                 registerDate: "تاريخ التسجيل",
                 lastLogin: "آخر دخول",
+                userVehicleData: "بيانات المركبات للمستخدمين",
+                filterByUser: "تصفية بالمستخدم:",
+                filterByDate: "تصفية بالتاريخ:",
+                updateHistory: "سجل التحديثات",
                 
                 // Edit Modal
                 editVehicle: "تعديل بيانات المركبة",
@@ -1566,6 +1628,7 @@
                 updateProfileBtn: "تحديث بيانات الحساب",
                 updateSuccess: "تم التحديث بنجاح",
                 excelDataUploaded: "تم رفع بيانات الإكسل بنجاح",
+                excelDataUpdated: "تم تحديث بيانات الإكسل بنجاح",
                 noExcelData: "لم يتم العثور على بيانات في ملف الإكسل",
                 invalidExcelFormat: "تنسيق ملف الإكسل غير صحيح",
                 filterResults: "نتائج التصفية",
@@ -1641,6 +1704,10 @@
                 excelFormat: "File must contain these columns in order: Plate Number, Previous Project, Current Project, Area, Basic Fuel Quota (SAR)",
                 previewData: "Preview Data",
                 uploadData: "Upload Data to System",
+                updateData: "Update Existing Data",
+                action: "Action",
+                newEntry: "New Entry",
+                updateExisting: "Update Existing",
                 
                 // Records
                 vehicleRecords: "Vehicle Records",
@@ -1668,6 +1735,10 @@
                 pending: "Pending",
                 registerDate: "Registration Date",
                 lastLogin: "Last Login",
+                userVehicleData: "User Vehicle Data",
+                filterByUser: "Filter by User:",
+                filterByDate: "Filter by Date:",
+                updateHistory: "Update History",
                 
                 // Edit Modal
                 editVehicle: "Edit Vehicle Data",
@@ -1695,6 +1766,7 @@
                 updateProfileBtn: "Update Account Data",
                 updateSuccess: "Updated successfully",
                 excelDataUploaded: "Excel data uploaded successfully",
+                excelDataUpdated: "Excel data updated successfully",
                 noExcelData: "No data found in Excel file",
                 invalidExcelFormat: "Invalid Excel file format",
                 filterResults: "Filter Results",
@@ -2083,6 +2155,11 @@
             if (currentUser) {
                 updateUserInfo();
                 loadVehicleRecords();
+                if (currentUser.role === 'admin') {
+                    loadPendingApprovals();
+                    loadAllUsers();
+                    loadUserVehicleData();
+                }
             }
         }
 
@@ -2142,7 +2219,8 @@
                         role: 'admin',
                         project: currentLanguage === 'ar' ? 'مدير النظام' : 'System Administrator',
                         area: currentLanguage === 'ar' ? 'جميع المناطق' : 'All Areas',
-                        status: 'active'
+                        status: 'active',
+                        password: '0906212775'
                     };
                     showMessage('authMessage', translate('loginSuccess'), 'success');
                     setTimeout(() => {
@@ -2275,6 +2353,11 @@
                 document.getElementById('previousProject').value = '';
                 document.getElementById('currentProject').value = '';
                 loadVehicleRecords();
+                
+                // تحديث بيانات المستخدمين تلقائياً للمسؤول
+                if (currentUser.role === 'admin') {
+                    loadUserVehicleData();
+                }
             });
 
             // نموذج الملف الشخصي
@@ -2350,6 +2433,11 @@
                 closeModal();
                 showMessage('dashboardMessage', translate('vehicleUpdated'), 'success');
                 loadVehicleRecords();
+                
+                // تحديث بيانات المستخدمين تلقائياً للمسؤول
+                if (currentUser.role === 'admin') {
+                    loadUserVehicleData();
+                }
             });
         }
 
@@ -2427,21 +2515,24 @@
                     previousProject: currentLanguage === 'ar' ? 'ارامكس' : 'Aramex',
                     currentProject: currentLanguage === 'ar' ? 'كيمارت' : 'Kimart',
                     area: currentLanguage === 'ar' ? 'الرياض' : 'Riyadh',
-                    basicFuelQuota: '500'
+                    basicFuelQuota: '500',
+                    action: translate('newEntry')
                 },
                 {
                     plateNumber: currentLanguage === 'ar' ? 'د هـ و 5678' : 'DEF 5678',
                     previousProject: currentLanguage === 'ar' ? 'المراعي' : 'Almarai',
                     currentProject: currentLanguage === 'ar' ? 'الببسي' : 'Pepsi',
                     area: currentLanguage === 'ar' ? 'الرياض' : 'Riyadh',
-                    basicFuelQuota: '750'
+                    basicFuelQuota: '750',
+                    action: translate('updateExisting')
                 },
                 {
                     plateNumber: currentLanguage === 'ar' ? 'ز ح ط 9012' : 'GHI 9012',
                     previousProject: currentLanguage === 'ar' ? 'كيمارت دبابات' : 'Kimart Dabat',
                     currentProject: currentLanguage === 'ar' ? 'فيديكس' : 'FedEx',
                     area: currentLanguage === 'ar' ? 'الدمام' : 'Dammam',
-                    basicFuelQuota: '600'
+                    basicFuelQuota: '600',
+                    action: translate('newEntry')
                 }
             ];
             
@@ -2462,6 +2553,7 @@
                     <td>${row.currentProject}</td>
                     <td>${row.area}</td>
                     <td>${row.basicFuelQuota} ${translate('fuelUnit')}</td>
+                    <td><span class="status-badge ${row.action === translate('newEntry') ? 'status-active' : 'status-warning'}">${row.action}</span></td>
                 `;
                 previewBody.appendChild(tr);
             });
@@ -2496,6 +2588,74 @@
             document.getElementById('excelFileInput').value = '';
             excelData = [];
             loadVehicleRecords();
+            
+            // تحديث بيانات المستخدمين تلقائياً للمسؤول
+            if (currentUser.role === 'admin') {
+                loadUserVehicleData();
+            }
+        }
+
+        async function updateExcelData() {
+            const now = new Date();
+            
+            for (const vehicle of excelData) {
+                const vehiclesRef = database.ref('vehicles');
+                const snapshot = await vehiclesRef.orderByChild('plateNumber').equalTo(vehicle.plateNumber).once('value');
+                const existingVehicles = snapshot.val();
+                
+                if (existingVehicles) {
+                    const vehicleKey = Object.keys(existingVehicles)[0];
+                    const vehicleRef = database.ref('vehicles/' + vehicleKey);
+                    const currentVehicle = existingVehicles[vehicleKey];
+                    
+                    const updates = {
+                        previousProject: vehicle.previousProject,
+                        currentProject: vehicle.currentProject,
+                        area: vehicle.area,
+                        basicFuelQuota: vehicle.basicFuelQuota,
+                        lastUpdatedBy: currentUser.username,
+                        lastUpdatedAt: now.toISOString()
+                    };
+                    
+                    const updateEntry = {
+                        updatedBy: currentUser.username,
+                        updatedAt: now.toISOString(),
+                        changes: `Updated via Excel by ${currentUser.username}`
+                    };
+                    
+                    const updateHistory = currentVehicle.updateHistory || [];
+                    updateHistory.push(updateEntry);
+                    updates.updateHistory = updateHistory;
+                    
+                    await vehicleRef.update(updates);
+                } else {
+                    const vehicleData = {
+                        ...vehicle,
+                        createdBy: currentUser.username,
+                        createdAt: now.toISOString(),
+                        lastUpdatedBy: currentUser.username,
+                        lastUpdatedAt: now.toISOString(),
+                        updateHistory: [{
+                            updatedBy: currentUser.username,
+                            updatedAt: now.toISOString(),
+                            changes: "Created via Excel"
+                        }]
+                    };
+                    
+                    await vehiclesRef.push(vehicleData);
+                }
+            }
+            
+            showMessage('dashboardMessage', translate('excelDataUpdated'), 'success');
+            document.getElementById('excelPreview').style.display = 'none';
+            document.getElementById('excelFileInput').value = '';
+            excelData = [];
+            loadVehicleRecords();
+            
+            // تحديث بيانات المستخدمين تلقائياً للمسؤول
+            if (currentUser.role === 'admin') {
+                loadUserVehicleData();
+            }
         }
 
         function showMessage(elementId, message, type) {
@@ -2525,6 +2685,7 @@
                 adminElements.forEach(el => el.style.display = 'block');
                 loadPendingApprovals();
                 loadAllUsers();
+                loadUserVehicleData();
             } else {
                 adminElements.forEach(el => el.style.display = 'none');
             }
@@ -2749,6 +2910,11 @@
                 await vehicleRef.remove();
                 showMessage('dashboardMessage', translate('vehicleDeleted'), 'success');
                 loadVehicleRecords();
+                
+                // تحديث بيانات المستخدمين تلقائياً للمسؤول
+                if (currentUser.role === 'admin') {
+                    loadUserVehicleData();
+                }
             }
         }
 
@@ -2781,6 +2947,7 @@
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td><strong>${user.username}</strong></td>
+                            <td>${user.password}</td>
                             <td>${user.project}</td>
                             <td>${user.area}</td>
                             <td>${registerDate}</td>
@@ -2803,7 +2970,7 @@
             document.getElementById('pendingCount').textContent = pendingCount;
             
             if (pendingCount === 0) {
-                pendingBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px;">${translate('noPendingRequests')}</td></tr>`;
+                pendingBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px;">${translate('noPendingRequests')}</td></tr>`;
             }
         }
 
@@ -2811,7 +2978,7 @@
             const usersBody = document.getElementById('usersBody');
             if (!usersBody) return;
             
-            usersBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 30px;">جارٍ التحميل...</td></tr>';
+            usersBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px;">جارٍ التحميل...</td></tr>';
             
             const usersRef = database.ref('users');
             const snapshot = await usersRef.once('value');
@@ -2834,6 +3001,7 @@
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td><strong>${user.username}</strong></td>
+                            <td>${user.password}</td>
                             <td>${user.project}</td>
                             <td>${user.area}</td>
                             <td><span class="status-badge ${statusClass}">${translate(user.status)}</span></td>
@@ -2867,8 +3035,110 @@
             document.getElementById('usersCount').textContent = usersCount;
             
             if (usersCount === 0) {
-                usersBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px;">${translate('noUsersRegistered')}</td></tr>`;
+                usersBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">${translate('noUsersRegistered')}</td></tr>`;
             }
+            
+            // تحديث قائمة التصفية للمستخدمين
+            updateUserFilterDropdown(users);
+        }
+
+        function updateUserFilterDropdown(users) {
+            const userFilter = document.getElementById('filterUserVehicles');
+            if (!userFilter) return;
+            
+            userFilter.innerHTML = `<option value="" data-i18n="allUsers">${translate('allUsers')}</option>`;
+            
+            if (users) {
+                const uniqueUsers = new Set();
+                Object.values(users).forEach(user => {
+                    if (user.username && user.username !== 'هوندا' && user.username !== 'Honda') {
+                        uniqueUsers.add(user.username);
+                    }
+                });
+                
+                uniqueUsers.forEach(username => {
+                    const option = document.createElement('option');
+                    option.value = username;
+                    option.textContent = username;
+                    userFilter.appendChild(option);
+                });
+            }
+        }
+
+        async function loadUserVehicleData() {
+            const userVehicleDataBody = document.getElementById('userVehicleDataBody');
+            if (!userVehicleDataBody) return;
+            
+            userVehicleDataBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px;">جارٍ التحميل...</td></tr>';
+            
+            const vehiclesRef = database.ref('vehicles');
+            const snapshot = await vehiclesRef.once('value');
+            const vehicles = snapshot.val();
+            
+            userVehicleDataBody.innerHTML = '';
+            let vehicleDataCount = 0;
+            
+            if (vehicles) {
+                Object.keys(vehicles).forEach(key => {
+                    const vehicle = vehicles[key];
+                    vehicleDataCount++;
+                    
+                    const lastUpdate = vehicle.lastUpdatedAt ? 
+                        new Date(vehicle.lastUpdatedAt).toLocaleString(currentLanguage === 'ar' ? 'ar-SA' : 'en-US') : 
+                        new Date(vehicle.createdAt).toLocaleString(currentLanguage === 'ar' ? 'ar-SA' : 'en-US');
+                    
+                    const updateHistory = vehicle.updateHistory || [];
+                    const historyText = updateHistory.map((entry, index) => {
+                        const date = new Date(entry.updatedAt).toLocaleString(currentLanguage === 'ar' ? 'ar-SA' : 'en-US');
+                        return `${index + 1}. ${date} - ${entry.updatedBy}: ${entry.changes || 'No details'}`;
+                    }).join('<br>');
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${vehicle.createdBy || 'Unknown'}</strong></td>
+                        <td>${vehicle.plateNumber}</td>
+                        <td>${vehicle.area}</td>
+                        <td>${vehicle.previousProject}</td>
+                        <td>${vehicle.currentProject}</td>
+                        <td>${vehicle.basicFuelQuota} ${translate('fuelUnit')}</td>
+                        <td><span class="timestamp-cell">${lastUpdate}</span></td>
+                        <td><div style="max-height: 100px; overflow-y: auto; font-size: 0.85rem;">${historyText || translate('noHistory')}</div></td>
+                    `;
+                    userVehicleDataBody.appendChild(row);
+                });
+            }
+            
+            document.getElementById('vehicleDataCount').textContent = vehicleDataCount;
+            
+            if (vehicleDataCount === 0) {
+                userVehicleDataBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 40px;">${translate('noVehicleData')}</td></tr>`;
+            }
+        }
+
+        function filterUserVehicleData() {
+            const userFilter = document.getElementById('filterUserVehicles');
+            const dateFilter = document.getElementById('filterDate');
+            
+            if (!userFilter || !dateFilter) return;
+            
+            const selectedUser = userFilter.value;
+            const selectedDate = dateFilter.value;
+            
+            const rows = document.querySelectorAll('#userVehicleDataBody tr');
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length < 8) return;
+                
+                const username = cells[0].textContent.trim();
+                const lastUpdateCell = cells[6].querySelector('.timestamp-cell');
+                const lastUpdate = lastUpdateCell ? lastUpdateCell.textContent : '';
+                
+                const userMatch = !selectedUser || username === selectedUser;
+                const dateMatch = !selectedDate || lastUpdate.includes(selectedDate);
+                
+                row.style.display = userMatch && dateMatch ? '' : 'none';
+            });
         }
 
         async function approveUser(userId) {
@@ -2948,6 +3218,11 @@
         translations.ar.noUsersRegistered = "لا يوجد مستخدمون مسجلون";
         translations.ar.confirmDeactivate = "هل أنت متأكد من تعطيل هذا المستخدم؟";
         translations.ar.noRecords = "لا توجد سجلات مركبات";
+        translations.ar.noHistory = "لا يوجد سجل تحديثات";
+        translations.ar.noVehicleData = "لا توجد بيانات مركبات";
+        translations.ar.statusWarning = "تحذير";
+        translations.ar.userDeactivated = "تم تعطيل المستخدم بنجاح";
+        translations.ar.userActivated = "تم تفعيل المستخدم بنجاح";
 
         translations.en.enterAreaName = "Please enter area name";
         translations.en.areaExists = "This area already exists";
@@ -2968,6 +3243,11 @@
         translations.en.noUsersRegistered = "No registered users";
         translations.en.confirmDeactivate = "Are you sure you want to deactivate this user?";
         translations.en.noRecords = "No vehicle records found";
+        translations.en.noHistory = "No update history";
+        translations.en.noVehicleData = "No vehicle data found";
+        translations.en.statusWarning = "Warning";
+        translations.en.userDeactivated = "User deactivated successfully";
+        translations.en.userActivated = "User activated successfully";
     </script>
 </body>
 </html>
