@@ -1570,6 +1570,7 @@
                 action: "الإجراء",
                 newEntry: "إدخال جديد",
                 updateExisting: "تحديث موجود",
+                noVehicle: "لا يوجد",
                 
                 // Records
                 vehicleRecords: "سجلات المركبات",
@@ -1708,6 +1709,7 @@
                 action: "Action",
                 newEntry: "New Entry",
                 updateExisting: "Update Existing",
+                noVehicle: "No Vehicle",
                 
                 // Records
                 vehicleRecords: "Vehicle Records",
@@ -1805,25 +1807,28 @@
                 "الرياض", "مكة المكرمة", "المدينة المنورة", "الدمام", "الخبر",
                 "جدة", "الطائف", "تبوك", "حائل", "بريدة",
                 "سكاكا", "أبها", "جازان", "نجران", "الباحة",
-                "عرعر", "القريات", "الجبيل", "ينبع", "رابغ"
+                "عرعر", "القريات", "الجبيل", "ينبع", "رابغ",
+                "الخرج", "الأحساء"
             ],
             en: [
                 "Riyadh", "Makkah", "Madinah", "Dammam", "Khobar",
                 "Jeddah", "Taif", "Tabuk", "Hail", "Buraidah",
                 "Sakaka", "Abha", "Jazan", "Najran", "Al Baha",
-                "Arar", "Al Qurayyat", "Al Jubail", "Yanbu", "Rabigh"
+                "Arar", "Al Qurayyat", "Al Jubail", "Yanbu", "Rabigh",
+                "Al Kharj", "Al Ahsa"
             ]
         };
 
-        // قائمة المشاريع - باللغتين
+        // قائمة المشاريع المنظمة بشكل صحيح - باللغتين
         let projectsList = {
             ar: [
+                // المشاريع مع المناطق المحددة
+                { name: "كيمارت", area: "الخرج" },
                 { name: "المراعي", area: "الرياض" },
                 { name: "ارامكس", area: "الرياض" },
                 { name: "كيمارت دبابات", area: "الدمام" },
                 { name: "نينجا دبابات", area: "الدمام" },
                 { name: "كيمارت", area: "الدمام" },
-                { name: "سلاسه", area: "الدمام" },
                 { name: "سلاسه", area: "الرياض" },
                 { name: "الببسي", area: "الرياض" },
                 { name: "6 ستريت", area: "الرياض" },
@@ -1843,15 +1848,9 @@
                 { name: "بندا", area: "مكة" },
                 { name: "مستودعات الزهراني", area: "الرياض" },
                 { name: "كي مارت", area: "تبوك" },
-                { name: "استارلنك", area: "تبوك" },
                 { name: "ناقل", area: "الرياض" },
-                { name: "كيتا", area: "الأحساء" },
-                { name: "كيتا", area: "مكة" },
-                { name: "نينجا كيتا", area: "الدمام" },
-                { name: "كيتا", area: "الدمام" },
-                { name: "كيتا", area: "المدينة المنورة" },
-                { name: "كيتا", area: "جدة" },
                 { name: "شيبا", area: "جازان" },
+                { name: "دينا", area: "جازان" },
                 { name: "فلو 6 استريت", area: "الرياض" },
                 { name: "فيرستكراى", area: "الرياض" },
                 { name: "كيتا", area: "الرياض" },
@@ -1860,15 +1859,22 @@
                 { name: "نون-3 بي ال", area: "الرياض" },
                 { name: "اى مكان", area: "الرياض" },
                 { name: "سلاسة", area: "الرياض" },
-                { name: "الدانة", area: "الرياض" }
+                { name: "الدانة", area: "الرياض" },
+                
+                // المشاريع العامة (بدون منطقة محددة)
+                { name: "سلاسه", area: "غير محدد" },
+                { name: "كيتا", area: "غير محدد" },
+                { name: "نينجا", area: "غير محدد" },
+                { name: "دبابات", area: "غير محدد" }
             ],
             en: [
+                // Projects with specific areas
+                { name: "Kimart", area: "Al Kharj" },
                 { name: "Almarai", area: "Riyadh" },
                 { name: "Aramex", area: "Riyadh" },
                 { name: "Kimart Dabat", area: "Dammam" },
                 { name: "Ninja Dabat", area: "Dammam" },
                 { name: "Kimart", area: "Dammam" },
-                { name: "Salasah", area: "Dammam" },
                 { name: "Salasah", area: "Riyadh" },
                 { name: "Pepsi", area: "Riyadh" },
                 { name: "6 Street", area: "Riyadh" },
@@ -1888,15 +1894,9 @@
                 { name: "Panda", area: "Makkah" },
                 { name: "Alzahrani Warehouses", area: "Riyadh" },
                 { name: "K Mart", area: "Tabuk" },
-                { name: "Starlink", area: "Tabuk" },
                 { name: "Naqel", area: "Riyadh" },
-                { name: "Kita", area: "Al Ahsa" },
-                { name: "Kita", area: "Makkah" },
-                { name: "Ninja Kita", area: "Dammam" },
-                { name: "Kita", area: "Dammam" },
-                { name: "Kita", area: "Madinah" },
-                { name: "Kita", area: "Jeddah" },
                 { name: "Sheba", area: "Jazan" },
+                { name: "Dina", area: "Jazan" },
                 { name: "Flow 6 Street", area: "Riyadh" },
                 { name: "FirstCry", area: "Riyadh" },
                 { name: "Kita", area: "Riyadh" },
@@ -1905,7 +1905,13 @@
                 { name: "Noon-3PL", area: "Riyadh" },
                 { name: "Anywhere", area: "Riyadh" },
                 { name: "Salasah", area: "Riyadh" },
-                { name: "Aldana", area: "Riyadh" }
+                { name: "Aldana", area: "Riyadh" },
+                
+                // General projects (no specific area)
+                { name: "Salasah", area: "Not specified" },
+                { name: "Kita", area: "Not specified" },
+                { name: "Ninja", area: "Not specified" },
+                { name: "Dabat", area: "Not specified" }
             ]
         };
 
@@ -2057,9 +2063,30 @@
                 );
             }
             
+            // إضافة خيار "لا يوجد" في الأعلى دائماً
+            const noVehicleOption = lang === 'ar' ? "لا يوجد" : "No Vehicle";
+            const hasNoVehicleOption = filteredProjects.some(p => p.name === noVehicleOption);
+            
+            if (!hasNoVehicleOption) {
+                filteredProjects.unshift({ name: noVehicleOption, area: lang === 'ar' ? "غير محدد" : "Not specified" });
+            }
+            
+            // فرز المشاريع: "لا يوجد" أولاً، ثم المشاريع الأخرى
+            filteredProjects.sort((a, b) => {
+                if (a.name === noVehicleOption) return -1;
+                if (b.name === noVehicleOption) return 1;
+                return a.name.localeCompare(b.name);
+            });
+            
             filteredProjects.forEach(project => {
                 const item = document.createElement('div');
                 item.className = 'project-item';
+                if (project.name === noVehicleOption) {
+                    item.style.background = '#f8f9fa';
+                    item.style.fontWeight = 'bold';
+                    item.style.color = '#666';
+                }
+                
                 item.innerHTML = `
                     <span>${project.name}</span>
                     <span class="project-area">${project.area}</span>
@@ -2309,13 +2336,8 @@
             document.getElementById('vehicleForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
-                const prevProject = document.getElementById('previousProject').value;
-                const currProject = document.getElementById('currentProject').value;
-                
-                if (!prevProject || !currProject) {
-                    showMessage('dashboardMessage', translate('selectBothProjects'), 'error');
-                    return;
-                }
+                const prevProject = document.getElementById('previousProject').value || translate('noVehicle');
+                const currProject = document.getElementById('currentProject').value || translate('noVehicle');
                 
                 const now = new Date();
                 const vehicle = {
@@ -2395,13 +2417,8 @@
                 e.preventDefault();
                 const now = new Date();
                 const vehicleId = document.getElementById('editId').value;
-                const editPrevProject = document.getElementById('editPrevProject').value;
-                const editCurrProject = document.getElementById('editCurrProject').value;
-                
-                if (!editPrevProject || !editCurrProject) {
-                    showMessage('dashboardMessage', translate('selectBothProjects'), 'error');
-                    return;
-                }
+                const editPrevProject = document.getElementById('editPrevProject').value || translate('noVehicle');
+                const editCurrProject = document.getElementById('editCurrProject').value || translate('noVehicle');
                 
                 const vehicleRef = database.ref('vehicles/' + vehicleId);
                 const snapshot = await vehicleRef.once('value');
@@ -2509,18 +2526,19 @@
         }
 
         function parseExcelData(data) {
+            // بيانات تجريبية للعرض
             excelData = [
                 {
                     plateNumber: currentLanguage === 'ar' ? 'أ ب ج 1234' : 'ABC 1234',
                     previousProject: currentLanguage === 'ar' ? 'ارامكس' : 'Aramex',
-                    currentProject: currentLanguage === 'ar' ? 'كيمارت' : 'Kimart',
+                    currentProject: currentLanguage === 'ar' ? 'لا يوجد' : 'No Vehicle',
                     area: currentLanguage === 'ar' ? 'الرياض' : 'Riyadh',
                     basicFuelQuota: '500',
                     action: translate('newEntry')
                 },
                 {
                     plateNumber: currentLanguage === 'ar' ? 'د هـ و 5678' : 'DEF 5678',
-                    previousProject: currentLanguage === 'ar' ? 'المراعي' : 'Almarai',
+                    previousProject: currentLanguage === 'ar' ? 'لا يوجد' : 'No Vehicle',
                     currentProject: currentLanguage === 'ar' ? 'الببسي' : 'Pepsi',
                     area: currentLanguage === 'ar' ? 'الرياض' : 'Riyadh',
                     basicFuelQuota: '750',
@@ -2528,8 +2546,8 @@
                 },
                 {
                     plateNumber: currentLanguage === 'ar' ? 'ز ح ط 9012' : 'GHI 9012',
-                    previousProject: currentLanguage === 'ar' ? 'كيمارت دبابات' : 'Kimart Dabat',
-                    currentProject: currentLanguage === 'ar' ? 'فيديكس' : 'FedEx',
+                    previousProject: currentLanguage === 'ar' ? 'لا يوجد' : 'No Vehicle',
+                    currentProject: currentLanguage === 'ar' ? 'لا يوجد' : 'No Vehicle',
                     area: currentLanguage === 'ar' ? 'الدمام' : 'Dammam',
                     basicFuelQuota: '600',
                     action: translate('newEntry')
