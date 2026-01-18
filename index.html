@@ -3914,14 +3914,18 @@
             }
         }
 
+        // التعديل الرئيسي: تصفية السجلات حسب المستخدم
         async function loadVehicleRecords() {
             const recordsBody = document.getElementById('recordsBody');
             if (!recordsBody) return;
             
             recordsBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;">جارٍ تحميل السجلات...</td></tr>';
             
-            const vehiclesRef = database.ref('vehicles');
-            const snapshot = await vehiclesRef.once('value');
+            let query = database.ref('vehicles');
+            if (currentUser.role === 'supervisor') {
+                query = query.orderByChild('createdBy').equalTo(currentUser.username);
+            }
+            const snapshot = await query.once('value');
             const vehicles = snapshot.val();
             
             recordsBody.innerHTML = '';
@@ -4036,10 +4040,17 @@
             });
         }
 
+        // التعديل الثاني: التحقق من صلاحية التعديل
         async function editVehicle(vehicleId) {
             const vehicleRef = database.ref('vehicles/' + vehicleId);
             const snapshot = await vehicleRef.once('value');
             const vehicle = snapshot.val();
+            
+            // التحقق من صلاحية التعديل
+            if (currentUser.role === 'supervisor' && vehicle.createdBy !== currentUser.username) {
+                showMessage('dashboardMessage', 'لا تملك صلاحية لتعديل هذه المركبة', 'error');
+                return;
+            }
             
             document.getElementById('editId').value = vehicleId;
             document.getElementById('editPlate').value = vehicle.plateNumber || '';
@@ -4085,9 +4096,18 @@
             document.getElementById('editModal').style.display = 'flex';
         }
 
+        // التعديل الثالث: التحقق من صلاحية الحذف
         async function deleteVehicle(vehicleId) {
             if (confirm(translate('confirmDelete'))) {
                 const vehicleRef = database.ref('vehicles/' + vehicleId);
+                const snapshot = await vehicleRef.once('value');
+                const vehicle = snapshot.val();
+                
+                if (currentUser.role === 'supervisor' && vehicle.createdBy !== currentUser.username) {
+                    showMessage('dashboardMessage', 'لا تملك صلاحية لحذف هذه المركبة', 'error');
+                    return;
+                }
+                
                 await vehicleRef.remove();
                 showMessage('dashboardMessage', translate('vehicleDeleted'), 'success');
                 loadVehicleRecords();
