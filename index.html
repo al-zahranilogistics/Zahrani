@@ -1,5 +1,4 @@
-
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -7,6 +6,8 @@
     <title>Alzahrani Logistics | PetroWeb Update System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- إضافة SheetJS لقراءة ملفات Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary: #1a237e;
@@ -381,6 +382,8 @@
         .nav-btn.admin { border-top-color: #ff9800; }
         .nav-btn.profile { border-top-color: #9c27b0; }
         .nav-btn.excel { border-top-color: #009688; }
+        .nav-btn.chip { border-top-color: #ff5722; }
+        .nav-btn.status { border-top-color: #673ab7; }
 
         .nav-btn i {
             font-size: 46px;
@@ -392,6 +395,8 @@
         .nav-btn.admin i { color: #ff9800; }
         .nav-btn.profile i { color: #9c27b0; }
         .nav-btn.excel i { color: #009688; }
+        .nav-btn.chip i { color: #ff5722; }
+        .nav-btn.status i { color: #673ab7; }
 
         .nav-btn span {
             font-size: 1.2rem;
@@ -666,6 +671,7 @@
         .approve-btn { background: linear-gradient(135deg, #4caf50, #66bb6a); }
         .update-btn { background: linear-gradient(135deg, #2196f3, #42a5f5); }
         .view-btn { background: linear-gradient(135deg, #9c27b0, #ab47bc); }
+        .download-btn { background: linear-gradient(135deg, #607d8b, #78909c); }
 
         /* Admin Specific */
         .admin-only {
@@ -697,6 +703,8 @@
         .status-active { background: #e8f5e9; color: #2e7d32; }
         .status-pending { background: #fff3e0; color: #ef6c00; }
         .status-inactive { background: #ffebee; color: #c62828; }
+        .status-working { background: #e3f2fd; color: #1565c0; }
+        .status-stopped { background: #fce4ec; color: #ad1457; }
 
         /* Modal */
         .modal-overlay {
@@ -822,6 +830,40 @@
             margin-top: 20px;
         }
 
+        /* Excel Template Download */
+        .template-download {
+            background: #f8f9fa;
+            border-radius: var(--radius);
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid var(--primary);
+        }
+
+        .template-download h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Vehicle Status Section */
+        .vehicle-status-section {
+            background: #f8f9fa;
+            border-radius: var(--radius);
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid #e0e0e0;
+        }
+
+        .chip-request-section {
+            background: #fff8e1;
+            border-radius: var(--radius);
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid #ffd54f;
+        }
+
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -905,6 +947,15 @@
             .nav-btn {
                 padding: 25px 15px;
             }
+            
+            .excel-actions {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -921,11 +972,6 @@
             
             .form-row {
                 grid-template-columns: 1fr;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-                gap: 8px;
             }
             
             .action-btn {
@@ -1087,6 +1133,18 @@
                 <p data-i18n="viewRecordsDesc">عرض وتعديل سجلات المركبات</p>
             </button>
             
+            <button class="nav-btn status" onclick="showSection('vehicleStatusSection')">
+                <i class="fas fa-car-battery"></i>
+                <span data-i18n="vehicleStatus">حالة المركبة</span>
+                <p data-i18n="vehicleStatusDesc">تحديث حالة المركبة (تعمل/متوقفة)</p>
+            </button>
+            
+            <button class="nav-btn chip" onclick="showSection('chipRequestSection')">
+                <i class="fas fa-sim-card"></i>
+                <span data-i18n="chipRequest">طلب شريحة</span>
+                <p data-i18n="chipRequestDesc">طلب شريحة جديدة أو استبدال تالفة</p>
+            </button>
+            
             <button class="nav-btn admin" onclick="showSection('adminSection')" id="adminNavBtn">
                 <i class="fas fa-crown"></i>
                 <span data-i18n="adminPanel">لوحة تحكم المسؤول</span>
@@ -1115,9 +1173,18 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label" data-i18n="area">المنطقة</label>
-                        <select id="vehicleArea" class="form-input" required>
-                            <option value="" data-i18n="selectArea">اختر المنطقة</option>
-                        </select>
+                        <div style="position: relative;">
+                            <select id="vehicleArea" class="form-input" required>
+                                <option value="" data-i18n="selectArea">اختر المنطقة</option>
+                            </select>
+                            <!-- Custom Area Input -->
+                            <div class="custom-option" style="margin-top: 10px;">
+                                <input type="text" id="vehicleCustomAreaInput" placeholder="أضف منطقة جديدة يدوياً..." data-i18n-ph="addCustomArea">
+                                <button type="button" class="btn-add" onclick="addCustomVehicleArea()">
+                                    <i class="fas fa-plus"></i> <span data-i18n="add">إضافة</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -1171,13 +1238,33 @@
                 <i class="fas fa-file-excel"></i>
                 <span data-i18n="uploadExcel">رفع ملف إكسل للبيانات</span>
             </h2>
+            
+            <!-- Excel Template Download -->
+            <div class="template-download">
+                <h3><i class="fas fa-download"></i> <span data-i18n="downloadTemplate">تحميل قالب Excel</span></h3>
+                <p data-i18n="templateDescription">قم بتحميل القالب لملئه بالبيانات ثم ارفعه للنظام</p>
+                <div class="excel-actions">
+                    <button class="btn btn-info" onclick="downloadExcelTemplate()">
+                        <i class="fas fa-file-download"></i>
+                        <span data-i18n="downloadTemplateBtn">تحميل قالب Excel</span>
+                    </button>
+                    <button class="btn btn-warning" onclick="downloadExcelTemplateWithData()">
+                        <i class="fas fa-database"></i>
+                        <span data-i18n="downloadWithData">تحميل مع البيانات الحالية</span>
+                    </button>
+                </div>
+            </div>
+            
             <div class="file-upload-area" onclick="document.getElementById('excelFileInput').click()" id="excelDropArea">
                 <i class="fas fa-file-upload"></i>
                 <h4 data-i18n="dropFile">اسحب وأفلت ملف إكسل هنا</h4>
                 <p data-i18n="clickToUpload">أو انقر لاختيار الملف من الجهاز</p>
                 <p style="color: #666; font-size: 0.9rem;" data-i18n="excelFormat">
-                    يجب أن يحتوي الملف على الأعمدة التالية بالترتيب:<br>
-                    رقم اللوحة، المشروع السابق، المشروع الحالي، المنطقة
+                    يجب أن يحتوي الملف على الأعمدة التالية:<br>
+                    <strong>رقم اللوحة</strong>، <strong>المشروع السابق</strong>، <strong>المشروع الحالي</strong>، <strong>المنطقة</strong>، <strong>حالة المركبة</strong>
+                </p>
+                <p style="color: var(--warning); font-size: 0.85rem;">
+                    <i class="fas fa-info-circle"></i> يمكن أن تكون الأعمدة بأي ترتيب
                 </p>
                 <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelFileSelect(event)">
             </div>
@@ -1197,6 +1284,13 @@
                         </button>
                     </div>
                 </div>
+                <div id="excelStats" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0;">
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div><strong>عدد المركبات:</strong> <span id="vehicleCount">0</span></div>
+                        <div><strong>إدخالات جديدة:</strong> <span id="newEntriesCount">0</span></div>
+                        <div><strong>تحديثات:</strong> <span id="updateEntriesCount">0</span></div>
+                    </div>
+                </div>
                 <div class="table-container">
                     <table class="data-table" id="excelPreviewTable">
                         <thead>
@@ -1205,7 +1299,9 @@
                                 <th data-i18n="previousProject">المشروع السابق</th>
                                 <th data-i18n="currentProject">المشروع الحالي</th>
                                 <th data-i18n="area">المنطقة</th>
+                                <th data-i18n="vehicleStatus">حالة المركبة</th>
                                 <th data-i18n="action">الإجراء</th>
+                                <th>ملاحظات</th>
                             </tr>
                         </thead>
                         <tbody id="excelPreviewBody">
@@ -1236,9 +1332,24 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label class="form-label" data-i18n="filterByStatus">تصفية بالحالة:</label>
+                    <select id="filterStatus" class="form-input" onchange="filterRecords()">
+                        <option value="" data-i18n="allStatuses">جميع الحالات</option>
+                        <option value="working" data-i18n="working">تعمل</option>
+                        <option value="stopped" data-i18n="stopped">متوقفة</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label class="form-label" data-i18n="searchPlate">بحث برقم اللوحة:</label>
                     <input type="text" id="searchPlate" class="form-input" placeholder="ابحث برقم اللوحة..." onkeyup="filterRecords()" data-i18n-ph="searchPlateNumber">
                 </div>
+            </div>
+            
+            <div class="excel-actions" style="margin-bottom: 20px;">
+                <button class="btn btn-info" onclick="downloadAllRecords()">
+                    <i class="fas fa-file-excel"></i>
+                    <span data-i18n="downloadRecords">تحميل السجلات كملف Excel</span>
+                </button>
             </div>
             
             <div class="table-container">
@@ -1249,6 +1360,7 @@
                             <th data-i18n="area">المنطقة</th>
                             <th data-i18n="previousProject">المشروع السابق</th>
                             <th data-i18n="currentProject">المشروع الحالي</th>
+                            <th data-i18n="vehicleStatus">حالة المركبة</th>
                             <th data-i18n="lastUpdate">آخر تحديث</th>
                             <th data-i18n="updatedBy">محدث بواسطة</th>
                             <th data-i18n="actions">الإجراءات</th>
@@ -1261,12 +1373,170 @@
             </div>
         </div>
 
+        <!-- Vehicle Status Section -->
+        <div id="vehicleStatusSection" class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-car-battery"></i>
+                <span data-i18n="updateVehicleStatus">تحديث حالة المركبة</span>
+            </h2>
+            
+            <div class="vehicle-status-section">
+                <form id="vehicleStatusForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="plateNumber">رقم اللوحة</label>
+                            <input type="text" id="statusPlateNumber" class="form-input" placeholder="أدخل رقم اللوحة" data-i18n-ph="enterPlateNumber" oninput="searchVehicleForStatus()">
+                            <div id="vehicleStatusResult" style="margin-top: 10px;"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="vehicleStatus">حالة المركبة</label>
+                            <select id="vehicleStatus" class="form-input" required>
+                                <option value="" data-i18n="selectStatus">اختر الحالة</option>
+                                <option value="working" data-i18n="working">تعمل/Working</option>
+                                <option value="stopped" data-i18n="stopped">متوقفة/Stopped</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="statusNotes">ملاحظات الحالة (اختياري)</label>
+                            <textarea id="statusNotes" class="form-input" rows="3" placeholder="أدخل ملاحظات عن حالة المركبة..." data-i18n-ph="enterStatusNotes"></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-sync-alt"></i>
+                        <span data-i18n="updateStatus">تحديث حالة المركبة</span>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Recent Status Updates -->
+            <h3 style="margin: 40px 0 20px; color: var(--info); display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-history"></i>
+                <span data-i18n="recentStatusUpdates">آخر تحديثات الحالة</span>
+            </h3>
+            <div class="table-container">
+                <table class="data-table" id="statusHistoryTable">
+                    <thead>
+                        <tr>
+                            <th data-i18n="plateNumber">رقم اللوحة</th>
+                            <th data-i18n="vehicleStatus">حالة المركبة</th>
+                            <th data-i18n="statusNotes">ملاحظات الحالة</th>
+                            <th data-i18n="updatedBy">محدث بواسطة</th>
+                            <th data-i18n="updateDate">تاريخ التحديث</th>
+                        </tr>
+                    </thead>
+                    <tbody id="statusHistoryBody">
+                        <!-- Status history will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Chip Request Section -->
+        <div id="chipRequestSection" class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-sim-card"></i>
+                <span data-i18n="chipRequest">طلب شريحة للمركبة</span>
+            </h2>
+            
+            <div class="chip-request-section">
+                <form id="chipRequestForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="plateNumber">رقم لوحة المركبة</label>
+                            <input type="text" id="chipPlateNumber" class="form-input" placeholder="أدخل رقم لوحة المركبة" data-i18n-ph="enterVehiclePlate" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="requestType">نوع الطلب</label>
+                            <select id="requestType" class="form-input" required>
+                                <option value="" data-i18n="selectRequestType">اختر نوع الطلب</option>
+                                <option value="new" data-i18n="newChip">شريحة جديدة/New Chip</option>
+                                <option value="damaged" data-i18n="damagedChip">شريحة تالفة/Damaged Chip</option>
+                                <option value="replacement" data-i18n="chipReplacement">استبدال شريحة/Chip Replacement</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="currentChipNumber">رقم الشريحة الحالي (إن وجد)</label>
+                            <input type="text" id="currentChipNumber" class="form-input" placeholder="أدخل رقم الشريحة الحالي" data-i18n-ph="enterCurrentChip">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="requestNotes">ملاحظات الطلب</label>
+                            <textarea id="requestNotes" class="form-input" rows="3" placeholder="أدخل ملاحظات إضافية عن الطلب..." data-i18n-ph="enterRequestNotes"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="urgentRequest">طلب عاجل</label>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                                <input type="checkbox" id="urgentRequest" style="width: 20px; height: 20px;">
+                                <label for="urgentRequest" data-i18n="urgentRequestLabel">هذا الطلب عاجل</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-paper-plane"></i>
+                        <span data-i18n="submitRequest">إرسال طلب الشريحة</span>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Recent Chip Requests -->
+            <h3 style="margin: 40px 0 20px; color: var(--warning); display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-list"></i>
+                <span data-i18n="recentChipRequests">طلبات الشريحة الأخيرة</span>
+            </h3>
+            <div class="table-container">
+                <table class="data-table" id="chipRequestsTable">
+                    <thead>
+                        <tr>
+                            <th data-i18n="plateNumber">رقم اللوحة</th>
+                            <th data-i18n="requestType">نوع الطلب</th>
+                            <th data-i18n="currentChipNumber">رقم الشريحة الحالي</th>
+                            <th data-i18n="requestNotes">ملاحظات الطلب</th>
+                            <th data-i18n="urgentRequest">طلب عاجل</th>
+                            <th data-i18n="requestStatus">حالة الطلب</th>
+                            <th data-i18n="requestedBy">مقدم الطلب</th>
+                            <th data-i18n="requestDate">تاريخ الطلب</th>
+                        </tr>
+                    </thead>
+                    <tbody id="chipRequestsBody">
+                        <!-- Chip requests will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Admin Section -->
         <div id="adminSection" class="content-section admin-only">
             <h2 class="section-title">
                 <i class="fas fa-crown"></i>
                 <span data-i18n="adminPanel">لوحة تحكم المسؤول</span>
             </h2>
+            
+            <!-- Quick Actions -->
+            <div class="form-row" style="margin-bottom: 30px;">
+                <div class="form-group">
+                    <button class="btn btn-info" onclick="downloadAllDataExcel()">
+                        <i class="fas fa-file-excel"></i>
+                        <span data-i18n="downloadAllData">تحميل جميع البيانات</span>
+                    </button>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-warning" onclick="downloadUsersDataExcel()">
+                        <i class="fas fa-users"></i>
+                        <span data-i18n="downloadUsersData">تحميل بيانات المستخدمين</span>
+                    </button>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-success" onclick="downloadChipRequestsExcel()">
+                        <i class="fas fa-sim-card"></i>
+                        <span data-i18n="downloadChipRequests">تحميل طلبات الشرائح</span>
+                    </button>
+                </div>
+            </div>
             
             <!-- Pending Approvals -->
             <h3 style="margin: 25px 0 20px; color: var(--warning); display: flex; align-items: center; gap: 10px;">
@@ -1298,6 +1568,20 @@
                 <span data-i18n="allUsers">جميع المستخدمين</span>
                 <span class="status-badge status-active" id="usersCount">0</span>
             </h3>
+            <div class="form-row" style="margin-bottom: 20px;">
+                <div class="form-group">
+                    <label class="form-label" data-i18n="filterByUser">تصفية بالمستخدم:</label>
+                    <select id="filterAdminUser" class="form-input" onchange="filterAdminUserData()">
+                        <option value="" data-i18n="allUsers">جميع المستخدمين</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-info" onclick="downloadUserSpecificData()" style="margin-top: 28px;">
+                        <i class="fas fa-download"></i>
+                        <span data-i18n="downloadUserData">تحميل بيانات المستخدم المحدد</span>
+                    </button>
+                </div>
+            </div>
             <div class="table-container">
                 <table class="data-table" id="usersTable">
                     <thead>
@@ -1334,6 +1618,12 @@
                     <label class="form-label" data-i18n="filterByDate">تصفية بالتاريخ:</label>
                     <input type="date" id="filterDate" class="form-input" onchange="filterUserVehicleData()">
                 </div>
+                <div class="form-group">
+                    <button class="btn btn-info" onclick="downloadFilteredVehicleData()" style="margin-top: 28px;">
+                        <i class="fas fa-download"></i>
+                        <span data-i18n="downloadFilteredData">تحميل البيانات المصفاة</span>
+                    </button>
+                </div>
             </div>
             <div class="table-container">
                 <table class="data-table" id="userVehicleDataTable">
@@ -1344,12 +1634,60 @@
                             <th data-i18n="area">المنطقة</th>
                             <th data-i18n="previousProject">المشروع السابق</th>
                             <th data-i18n="currentProject">المشروع الحالي</th>
+                            <th data-i18n="vehicleStatus">حالة المركبة</th>
                             <th data-i18n="lastUpdate">آخر تحديث</th>
                             <th data-i18n="updateHistory">سجل التحديثات</th>
                         </tr>
                     </thead>
                     <tbody id="userVehicleDataBody">
                         <!-- User vehicle data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Chip Requests Management -->
+            <h3 style="margin: 40px 0 20px; color: #ff5722; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-sim-card"></i>
+                <span data-i18n="chipRequestsManagement">إدارة طلبات الشرائح</span>
+                <span class="status-badge status-pending" id="chipRequestsCount">0</span>
+            </h3>
+            <div class="form-row" style="margin-bottom: 20px;">
+                <div class="form-group">
+                    <label class="form-label" data-i18n="filterByStatus">تصفية بحالة الطلب:</label>
+                    <select id="filterChipStatus" class="form-input" onchange="filterChipRequests()">
+                        <option value="" data-i18n="allStatuses">جميع الحالات</option>
+                        <option value="pending" data-i18n="pending">قيد الانتظار</option>
+                        <option value="approved" data-i18n="approved">معتمدة</option>
+                        <option value="rejected" data-i18n="rejected">مرفوضة</option>
+                        <option value="completed" data-i18n="completed">مكتملة</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-i18n="filterByUrgent">طلبات عاجلة فقط:</label>
+                    <select id="filterUrgent" class="form-input" onchange="filterChipRequests()">
+                        <option value="" data-i18n="all">الكل</option>
+                        <option value="yes" data-i18n="yes">نعم</option>
+                        <option value="no" data-i18n="no">لا</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table" id="adminChipRequestsTable">
+                    <thead>
+                        <tr>
+                            <th data-i18n="plateNumber">رقم اللوحة</th>
+                            <th data-i18n="requestType">نوع الطلب</th>
+                            <th data-i18n="currentChipNumber">رقم الشريحة الحالي</th>
+                            <th data-i18n="requestNotes">ملاحظات الطلب</th>
+                            <th data-i18n="urgentRequest">طلب عاجل</th>
+                            <th data-i18n="requestedBy">مقدم الطلب</th>
+                            <th data-i18n="requestDate">تاريخ الطلب</th>
+                            <th data-i18n="requestStatus">حالة الطلب</th>
+                            <th data-i18n="actions">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminChipRequestsBody">
+                        <!-- Admin chip requests will be loaded here -->
                     </tbody>
                 </table>
             </div>
@@ -1428,7 +1766,15 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label" data-i18n="area">المنطقة</label>
-                            <select id="editArea" class="form-input" required></select>
+                            <div style="position: relative;">
+                                <select id="editArea" class="form-input" required></select>
+                                <div class="custom-option" style="margin-top: 10px;">
+                                    <input type="text" id="editCustomAreaInput" placeholder="أضف منطقة جديدة يدوياً..." data-i18n-ph="addCustomArea">
+                                    <button type="button" class="btn-add" onclick="addCustomEditArea()">
+                                        <i class="fas fa-plus"></i> <span data-i18n="add">إضافة</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="form-row">
@@ -1460,6 +1806,14 @@
                         </div>
                     </div>
                     <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="vehicleStatus">حالة المركبة</label>
+                            <select id="editVehicleStatus" class="form-input">
+                                <option value="" data-i18n="selectStatus">اختر الحالة</option>
+                                <option value="working" data-i18n="working">تعمل/Working</option>
+                                <option value="stopped" data-i18n="stopped">متوقفة/Stopped</option>
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label class="form-label" data-i18n="additionalInfo">معلومات إضافية</label>
                             <input type="text" id="editAdditionalInfo" class="form-input" placeholder="ملاحظات إضافية" data-i18n-ph="additionalNotes">
@@ -1534,6 +1888,10 @@
                 adminPanelDesc: "إدارة المشرفين والصلاحيات",
                 updateProfile: "الملف الشخصي",
                 updateProfileDesc: "تحديث بيانات الحساب الشخصي",
+                vehicleStatus: "حالة المركبة",
+                vehicleStatusDesc: "تحديث حالة المركبة (تعمل/متوقفة)",
+                chipRequest: "طلب شريحة",
+                chipRequestDesc: "طلب شريحة جديدة أو استبدال تالفة",
                 
                 // Vehicle Entry
                 vehicleEntry: "إدخال بيانات مركبة جديدة",
@@ -1546,14 +1904,55 @@
                 // Excel Upload
                 dropFile: "اسحب وأفلت ملف إكسل هنا",
                 clickToUpload: "أو انقر لاختيار الملف من الجهاز",
-                excelFormat: "يجب أن يحتوي الملف على الأعمدة التالية بالترتيب: رقم اللوحة، المشروع السابق، المشروع الحالي، المنطقة",
+                excelFormat: "يجب أن يحتوي الملف على الأعمدة التالية:<br><strong>رقم اللوحة</strong>، <strong>المشروع السابق</strong>، <strong>المشروع الحالي</strong>، <strong>المنطقة</strong>، <strong>حالة المركبة</strong>",
                 previewData: "معاينة البيانات",
                 uploadData: "رفع البيانات إلى النظام",
                 updateData: "تحديث البيانات الموجودة",
+                downloadTemplate: "تحميل قالب Excel",
+                templateDescription: "قم بتحميل القالب لملئه بالبيانات ثم ارفعه للنظام",
+                downloadTemplateBtn: "تحميل قالب Excel",
+                downloadWithData: "تحميل مع البيانات الحالية",
                 action: "الإجراء",
                 newEntry: "إدخال جديد",
                 updateExisting: "تحديث موجود",
                 noVehicle: "لا يوجد",
+                downloadRecords: "تحميل السجلات كملف Excel",
+                
+                // Vehicle Status
+                updateVehicleStatus: "تحديث حالة المركبة",
+                vehicleStatus: "حالة المركبة",
+                selectStatus: "اختر الحالة",
+                working: "تعمل",
+                stopped: "متوقفة",
+                statusNotes: "ملاحظات الحالة",
+                enterStatusNotes: "أدخل ملاحظات عن حالة المركبة...",
+                updateStatus: "تحديث حالة المركبة",
+                recentStatusUpdates: "آخر تحديثات الحالة",
+                enterPlateNumber: "أدخل رقم اللوحة",
+                updateDate: "تاريخ التحديث",
+                allStatuses: "جميع الحالات",
+                
+                // Chip Request
+                chipRequest: "طلب شريحة للمركبة",
+                requestType: "نوع الطلب",
+                selectRequestType: "اختر نوع الطلب",
+                newChip: "شريحة جديدة",
+                damagedChip: "شريحة تالفة",
+                chipReplacement: "استبدال شريحة",
+                currentChipNumber: "رقم الشريحة الحالي",
+                enterCurrentChip: "أدخل رقم الشريحة الحالي",
+                requestNotes: "ملاحظات الطلب",
+                enterRequestNotes: "أدخل ملاحظات إضافية عن الطلب...",
+                urgentRequest: "طلب عاجل",
+                urgentRequestLabel: "هذا الطلب عاجل",
+                submitRequest: "إرسال طلب الشريحة",
+                recentChipRequests: "طلبات الشريحة الأخيرة",
+                requestedBy: "مقدم الطلب",
+                requestDate: "تاريخ الطلب",
+                requestStatus: "حالة الطلب",
+                enterVehiclePlate: "أدخل رقم لوحة المركبة",
+                yes: "نعم",
+                no: "لا",
                 
                 // Records
                 vehicleRecords: "سجلات المركبات",
@@ -1561,6 +1960,9 @@
                 allAreas: "جميع المناطق",
                 filterByProject: "تصفية بالمشروع:",
                 allProjects: "جميع المشاريع",
+                filterByStatus: "تصفية بالحالة:",
+                filterByUrgent: "طلبات عاجلة فقط:",
+                all: "الكل",
                 searchPlate: "بحث برقم اللوحة:",
                 lastUpdate: "آخر تحديث",
                 updatedBy: "محدث بواسطة",
@@ -1579,12 +1981,22 @@
                 status: "الحالة",
                 active: "نشط",
                 pending: "قيد الانتظار",
+                approved: "معتمدة",
+                rejected: "مرفوضة",
+                completed: "مكتملة",
                 registerDate: "تاريخ التسجيل",
                 lastLogin: "آخر دخول",
                 userVehicleData: "بيانات المركبات للمستخدمين",
                 filterByUser: "تصفية بالمستخدم:",
                 filterByDate: "تصفية بالتاريخ:",
                 updateHistory: "سجل التحديثات",
+                downloadAllData: "تحميل جميع البيانات",
+                downloadUsersData: "تحميل بيانات المستخدمين",
+                downloadChipRequests: "تحميل طلبات الشرائح",
+                downloadUserData: "تحميل بيانات المستخدم المحدد",
+                downloadFilteredData: "تحميل البيانات المصفاة",
+                chipRequestsManagement: "إدارة طلبات الشرائح",
+                chipRequestsCount: "عدد الطلبات",
                 
                 // Edit Modal
                 editVehicle: "تعديل بيانات المركبة",
@@ -1622,6 +2034,9 @@
                 lastUpdateTime: "وقت التحديث",
                 plateArabicWarning: "ممنوع استخدام الحروف العربية في رقم اللوحة",
                 plateLowercaseWarning: "يجب أن تكون الحروف الإنجليزية كبتل (CAPITAL) فقط",
+                statusUpdated: "تم تحديث حالة المركبة بنجاح",
+                chipRequestSubmitted: "تم إرسال طلب الشريحة بنجاح",
+                chipRequestUpdated: "تم تحديث حالة طلب الشريحة",
                 
                 // General
                 add: "إضافة",
@@ -1669,6 +2084,10 @@
                 adminPanelDesc: "Manage supervisors and permissions",
                 updateProfile: "Profile Settings",
                 updateProfileDesc: "Update account information",
+                vehicleStatus: "Vehicle Status",
+                vehicleStatusDesc: "Update vehicle status (Working/Stopped)",
+                chipRequest: "Chip Request",
+                chipRequestDesc: "Request new chip or replace damaged one",
                 
                 // Vehicle Entry
                 vehicleEntry: "New Vehicle Entry",
@@ -1681,14 +2100,55 @@
                 // Excel Upload
                 dropFile: "Drag & Drop Excel File Here",
                 clickToUpload: "Or click to select file from device",
-                excelFormat: "File must contain these columns in order: Plate Number, Previous Project, Current Project, Area",
+                excelFormat: "File must contain these columns:<br><strong>Plate Number</strong>, <strong>Previous Project</strong>, <strong>Current Project</strong>, <strong>Area</strong>, <strong>Vehicle Status</strong>",
                 previewData: "Preview Data",
                 uploadData: "Upload Data to System",
                 updateData: "Update Existing Data",
+                downloadTemplate: "Download Excel Template",
+                templateDescription: "Download template, fill with data, then upload to system",
+                downloadTemplateBtn: "Download Excel Template",
+                downloadWithData: "Download with Current Data",
                 action: "Action",
                 newEntry: "New Entry",
                 updateExisting: "Update Existing",
                 noVehicle: "No Vehicle",
+                downloadRecords: "Download Records as Excel",
+                
+                // Vehicle Status
+                updateVehicleStatus: "Update Vehicle Status",
+                vehicleStatus: "Vehicle Status",
+                selectStatus: "Select Status",
+                working: "Working",
+                stopped: "Stopped",
+                statusNotes: "Status Notes",
+                enterStatusNotes: "Enter notes about vehicle status...",
+                updateStatus: "Update Vehicle Status",
+                recentStatusUpdates: "Recent Status Updates",
+                enterPlateNumber: "Enter plate number",
+                updateDate: "Update Date",
+                allStatuses: "All Statuses",
+                
+                // Chip Request
+                chipRequest: "Vehicle Chip Request",
+                requestType: "Request Type",
+                selectRequestType: "Select Request Type",
+                newChip: "New Chip",
+                damagedChip: "Damaged Chip",
+                chipReplacement: "Chip Replacement",
+                currentChipNumber: "Current Chip Number",
+                enterCurrentChip: "Enter current chip number",
+                requestNotes: "Request Notes",
+                enterRequestNotes: "Enter additional notes about request...",
+                urgentRequest: "Urgent Request",
+                urgentRequestLabel: "This is an urgent request",
+                submitRequest: "Submit Chip Request",
+                recentChipRequests: "Recent Chip Requests",
+                requestedBy: "Requested By",
+                requestDate: "Request Date",
+                requestStatus: "Request Status",
+                enterVehiclePlate: "Enter vehicle plate number",
+                yes: "Yes",
+                no: "No",
                 
                 // Records
                 vehicleRecords: "Vehicle Records",
@@ -1696,6 +2156,9 @@
                 allAreas: "All Areas",
                 filterByProject: "Filter by Project:",
                 allProjects: "All Projects",
+                filterByStatus: "Filter by Status:",
+                filterByUrgent: "Urgent Requests Only:",
+                all: "All",
                 searchPlate: "Search by Plate:",
                 lastUpdate: "Last Update",
                 updatedBy: "Updated By",
@@ -1714,12 +2177,22 @@
                 status: "Status",
                 active: "Active",
                 pending: "Pending",
+                approved: "Approved",
+                rejected: "Rejected",
+                completed: "Completed",
                 registerDate: "Registration Date",
                 lastLogin: "Last Login",
                 userVehicleData: "User Vehicle Data",
                 filterByUser: "Filter by User:",
                 filterByDate: "Filter by Date:",
                 updateHistory: "Update History",
+                downloadAllData: "Download All Data",
+                downloadUsersData: "Download Users Data",
+                downloadChipRequests: "Download Chip Requests",
+                downloadUserData: "Download Selected User Data",
+                downloadFilteredData: "Download Filtered Data",
+                chipRequestsManagement: "Chip Requests Management",
+                chipRequestsCount: "Requests Count",
                 
                 // Edit Modal
                 editVehicle: "Edit Vehicle Data",
@@ -1757,6 +2230,9 @@
                 lastUpdateTime: "Update Time",
                 plateArabicWarning: "Arabic letters are not allowed in plate number",
                 plateLowercaseWarning: "English letters must be CAPITAL only",
+                statusUpdated: "Vehicle status updated successfully",
+                chipRequestSubmitted: "Chip request submitted successfully",
+                chipRequestUpdated: "Chip request status updated",
                 
                 // General
                 add: "Add",
@@ -1777,7 +2253,7 @@
             }
         };
 
-        // المناطق باللغتين - بنفس الصيغة: العربية/English
+        // المناطق باللغتين
         let saudiAreas = {
             ar: [
                 "الرياض/Riyadh",
@@ -1829,7 +2305,7 @@
             ]
         };
 
-        // قائمة المشاريع باللغتين - بنفس الصيغة: العربية/English
+        // قائمة المشاريع باللغتين
         let projectsList = {
             ar: [
                 "كيمارت/Kimart",
@@ -1859,7 +2335,7 @@
                 "ناقل/Naqel",
                 "شيبا/Sheba",
                 "دينا/Dina",
-                "فلو 6 استريت/Flow 6 Street",
+                "فلو/Flow",
                 "فيرستكراى/FirstCry",
                 "كيتا/Kita",
                 "نابكو/Nabco",
@@ -1898,7 +2374,7 @@
                 "ناقل/Naqel",
                 "شيبا/Sheba",
                 "دينا/Dina",
-                "فلو 6 استريت/Flow 6 Street",
+                "فلو/Flow",
                 "فيرستكراى/FirstCry",
                 "كيتا/Kita",
                 "نابكو/Nabco",
@@ -1911,9 +2387,23 @@
             ]
         };
 
+        // Vehicle Status Options
+        const vehicleStatusOptions = {
+            ar: ["تعمل/Working", "متوقفة/Stopped"],
+            en: ["تعمل/Working", "متوقفة/Stopped"]
+        };
+
+        // Chip Request Types
+        const chipRequestTypes = {
+            ar: ["شريحة جديدة/New Chip", "شريحة تالفة/Damaged Chip", "استبدال شريحة/Chip Replacement"],
+            en: ["شريحة جديدة/New Chip", "شريحة تالفة/Damaged Chip", "استبدال شريحة/Chip Replacement"]
+        };
+
         let currentUser = null;
         let currentLanguage = 'ar';
         let excelData = [];
+        let excelOriginalData = [];
+        let existingVehiclesMap = {};
         let selectedProject = '';
         let selectedArea = '';
 
@@ -1946,7 +2436,7 @@
             });
         }
 
-        // إضافة منطقة مخصصة
+        // إضافة منطقة مخصصة في نموذج التسجيل
         function addCustomArea() {
             const customAreaInput = document.getElementById('customAreaInput');
             const areaName = customAreaInput.value.trim();
@@ -1982,6 +2472,80 @@
             customAreaInput.value = '';
             
             showMessage('authMessage', `تمت إضافة المنطقة "${areaName}"`, 'success');
+        }
+
+        // إضافة منطقة مخصصة في نموذج المركبة
+        function addCustomVehicleArea() {
+            const customAreaInput = document.getElementById('vehicleCustomAreaInput');
+            const areaName = customAreaInput.value.trim();
+            
+            if (!areaName) {
+                showMessage('dashboardMessage', 'الرجاء إدخال اسم المنطقة', 'error');
+                return;
+            }
+            
+            // التحقق من صيغة المنطقة
+            if (!areaName.includes('/')) {
+                showMessage('dashboardMessage', 'يجب إدخال المنطقة بالصيغة: عربي/إنجليزي', 'error');
+                return;
+            }
+            
+            if (saudiAreas[currentLanguage].includes(areaName)) {
+                showMessage('dashboardMessage', 'هذه المنطقة موجودة بالفعل', 'info');
+                return;
+            }
+            
+            saudiAreas[currentLanguage].push(areaName);
+            
+            // إضافة للغة الأخرى أيضاً
+            const otherLang = currentLanguage === 'ar' ? 'en' : 'ar';
+            saudiAreas[otherLang].push(areaName);
+            
+            loadAreas();
+            
+            const vehicleAreaSelect = document.getElementById('vehicleArea');
+            vehicleAreaSelect.value = areaName;
+            
+            customAreaInput.value = '';
+            
+            showMessage('dashboardMessage', `تمت إضافة المنطقة "${areaName}"`, 'success');
+        }
+
+        // إضافة منطقة مخصصة في نموذج التعديل
+        function addCustomEditArea() {
+            const customAreaInput = document.getElementById('editCustomAreaInput');
+            const areaName = customAreaInput.value.trim();
+            
+            if (!areaName) {
+                showMessage('dashboardMessage', 'الرجاء إدخال اسم المنطقة', 'error');
+                return;
+            }
+            
+            // التحقق من صيغة المنطقة
+            if (!areaName.includes('/')) {
+                showMessage('dashboardMessage', 'يجب إدخال المنطقة بالصيغة: عربي/إنجليزي', 'error');
+                return;
+            }
+            
+            if (saudiAreas[currentLanguage].includes(areaName)) {
+                showMessage('dashboardMessage', 'هذه المنطقة موجودة بالفعل', 'info');
+                return;
+            }
+            
+            saudiAreas[currentLanguage].push(areaName);
+            
+            // إضافة للغة الأخرى أيضاً
+            const otherLang = currentLanguage === 'ar' ? 'en' : 'ar';
+            saudiAreas[otherLang].push(areaName);
+            
+            loadAreas();
+            
+            const editAreaSelect = document.getElementById('editArea');
+            editAreaSelect.value = areaName;
+            
+            customAreaInput.value = '';
+            
+            showMessage('dashboardMessage', `تمت إضافة المنطقة "${areaName}"`, 'success');
         }
 
         // إضافة مشروع مخصص
@@ -2239,10 +2803,13 @@
             if (currentUser) {
                 updateUserInfo();
                 loadVehicleRecords();
+                loadVehicleStatusHistory();
+                loadChipRequests();
                 if (currentUser.role === 'admin') {
                     loadPendingApprovals();
                     loadAllUsers();
                     loadUserVehicleData();
+                    loadAdminChipRequests();
                 }
             }
         }
@@ -2400,13 +2967,20 @@
                 
                 const prevProject = document.getElementById('previousProject').value || 'لا يوجد/No Vehicle';
                 const currProject = document.getElementById('currentProject').value || 'لا يوجد/No Vehicle';
+                const area = document.getElementById('vehicleArea').value;
+                
+                if (!area) {
+                    showMessage('dashboardMessage', 'الرجاء اختيار المنطقة', 'error');
+                    return;
+                }
                 
                 const now = new Date();
                 const vehicle = {
                     plateNumber: plateNumber,
-                    area: document.getElementById('vehicleArea').value,
+                    area: area,
                     previousProject: prevProject,
                     currentProject: currProject,
+                    vehicleStatus: 'working',
                     additionalInfo: document.getElementById('additionalInfo').value || '',
                     createdBy: currentUser.username,
                     createdAt: now.toISOString(),
@@ -2440,6 +3014,121 @@
                 // تحديث بيانات المستخدمين تلقائياً للمسؤول
                 if (currentUser.role === 'admin') {
                     loadUserVehicleData();
+                }
+            });
+
+            // نموذج حالة المركبة
+            document.getElementById('vehicleStatusForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const plateNumber = document.getElementById('statusPlateNumber').value;
+                const vehicleStatus = document.getElementById('vehicleStatus').value;
+                const statusNotes = document.getElementById('statusNotes').value;
+                
+                if (!plateNumber) {
+                    showMessage('dashboardMessage', 'الرجاء إدخال رقم اللوحة', 'error');
+                    return;
+                }
+                
+                if (!vehicleStatus) {
+                    showMessage('dashboardMessage', 'الرجاء اختيار حالة المركبة', 'error');
+                    return;
+                }
+                
+                // البحث عن المركبة
+                const vehiclesRef = database.ref('vehicles');
+                const snapshot = await vehiclesRef.orderByChild('plateNumber').equalTo(plateNumber).once('value');
+                const vehicles = snapshot.val();
+                
+                if (!vehicles) {
+                    showMessage('dashboardMessage', 'لم يتم العثور على مركبة بهذا الرقم', 'error');
+                    return;
+                }
+                
+                const vehicleKey = Object.keys(vehicles)[0];
+                const vehicle = vehicles[vehicleKey];
+                const now = new Date();
+                
+                // تحديث حالة المركبة
+                const updates = {
+                    vehicleStatus: vehicleStatus,
+                    lastUpdatedBy: currentUser.username,
+                    lastUpdatedAt: now.toISOString()
+                };
+                
+                const updateEntry = {
+                    updatedBy: currentUser.username,
+                    updatedAt: now.toISOString(),
+                    changes: `Vehicle status changed to ${vehicleStatus}`,
+                    notes: statusNotes
+                };
+                
+                const updateHistory = vehicle.updateHistory || [];
+                updateHistory.push(updateEntry);
+                updates.updateHistory = updateHistory;
+                
+                await database.ref('vehicles/' + vehicleKey).update(updates);
+                
+                // إضافة إلى سجل حالات المركبات
+                const statusHistoryRef = database.ref('vehicleStatusHistory');
+                await statusHistoryRef.push({
+                    plateNumber: plateNumber,
+                    vehicleStatus: vehicleStatus,
+                    statusNotes: statusNotes,
+                    updatedBy: currentUser.username,
+                    updatedAt: now.toISOString(),
+                    vehicleId: vehicleKey
+                });
+                
+                showMessage('dashboardMessage', translate('statusUpdated'), 'success');
+                document.getElementById('vehicleStatusForm').reset();
+                loadVehicleStatusHistory();
+                loadVehicleRecords();
+            });
+
+            // نموذج طلب الشريحة
+            document.getElementById('chipRequestForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const plateNumber = document.getElementById('chipPlateNumber').value;
+                const requestType = document.getElementById('requestType').value;
+                const currentChipNumber = document.getElementById('currentChipNumber').value;
+                const requestNotes = document.getElementById('requestNotes').value;
+                const urgentRequest = document.getElementById('urgentRequest').checked;
+                
+                if (!plateNumber) {
+                    showMessage('dashboardMessage', 'الرجاء إدخال رقم لوحة المركبة', 'error');
+                    return;
+                }
+                
+                if (!requestType) {
+                    showMessage('dashboardMessage', 'الرجاء اختيار نوع الطلب', 'error');
+                    return;
+                }
+                
+                const now = new Date();
+                const chipRequest = {
+                    plateNumber: plateNumber,
+                    requestType: requestType,
+                    currentChipNumber: currentChipNumber || '',
+                    requestNotes: requestNotes,
+                    urgentRequest: urgentRequest,
+                    requestStatus: 'pending',
+                    requestedBy: currentUser.username,
+                    requestedAt: now.toISOString(),
+                    requestId: generateRequestId()
+                };
+                
+                const chipRequestsRef = database.ref('chipRequests');
+                await chipRequestsRef.push(chipRequest);
+                
+                showMessage('dashboardMessage', translate('chipRequestSubmitted'), 'success');
+                document.getElementById('chipRequestForm').reset();
+                document.getElementById('urgentRequest').checked = false;
+                loadChipRequests();
+                
+                if (currentUser.role === 'admin') {
+                    loadAdminChipRequests();
                 }
             });
 
@@ -2486,6 +3175,13 @@
                 const vehicleId = document.getElementById('editId').value;
                 const editPrevProject = document.getElementById('editPrevProject').value || 'لا يوجد/No Vehicle';
                 const editCurrProject = document.getElementById('editCurrProject').value || 'لا يوجد/No Vehicle';
+                const editArea = document.getElementById('editArea').value;
+                const vehicleStatus = document.getElementById('editVehicleStatus').value;
+                
+                if (!editArea) {
+                    showMessage('dashboardMessage', 'الرجاء اختيار المنطقة', 'error');
+                    return;
+                }
                 
                 const vehicleRef = database.ref('vehicles/' + vehicleId);
                 const snapshot = await vehicleRef.once('value');
@@ -2493,13 +3189,17 @@
                 
                 const updates = {
                     plateNumber: plateNumber,
-                    area: document.getElementById('editArea').value,
+                    area: editArea,
                     previousProject: editPrevProject,
                     currentProject: editCurrProject,
                     additionalInfo: document.getElementById('editAdditionalInfo').value || '',
                     lastUpdatedBy: currentUser.username,
                     lastUpdatedAt: now.toISOString()
                 };
+                
+                if (vehicleStatus) {
+                    updates.vehicleStatus = vehicleStatus;
+                }
                 
                 const updateEntry = {
                     updatedBy: currentUser.username,
@@ -2522,6 +3222,48 @@
                     loadUserVehicleData();
                 }
             });
+        }
+
+        // توليد رقم طلب
+        function generateRequestId() {
+            const timestamp = Date.now();
+            const random = Math.floor(Math.random() * 1000);
+            return `REQ-${timestamp}-${random}`;
+        }
+
+        // البحث عن مركبة للحالة
+        async function searchVehicleForStatus() {
+            const plateNumber = document.getElementById('statusPlateNumber').value;
+            const resultDiv = document.getElementById('vehicleStatusResult');
+            
+            if (!plateNumber) {
+                resultDiv.innerHTML = '';
+                return;
+            }
+            
+            const vehiclesRef = database.ref('vehicles');
+            const snapshot = await vehiclesRef.orderByChild('plateNumber').equalTo(plateNumber).once('value');
+            const vehicles = snapshot.val();
+            
+            if (vehicles) {
+                const vehicleKey = Object.keys(vehicles)[0];
+                const vehicle = vehicles[vehicleKey];
+                
+                resultDiv.innerHTML = `
+                    <div style="background: #e8f5e9; padding: 10px; border-radius: 6px; border: 1px solid #c8e6c9;">
+                        <strong>المركبة موجودة:</strong> ${vehicle.plateNumber}<br>
+                        <strong>المنطقة:</strong> ${vehicle.area}<br>
+                        <strong>المشروع الحالي:</strong> ${vehicle.currentProject}<br>
+                        <strong>الحالة الحالية:</strong> ${vehicle.vehicleStatus === 'working' ? 'تعمل' : 'متوقفة'}
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div style="background: #ffebee; padding: 10px; border-radius: 6px; border: 1px solid #ffcdd2;">
+                        <strong>⚠️ لم يتم العثور على مركبة بهذا الرقم</strong>
+                    </div>
+                `;
+            }
         }
 
         // إعداد السحب والإفلات
@@ -2572,52 +3314,160 @@
             handleExcelFiles(files);
         }
 
-        function handleExcelFiles(files) {
+        async function handleExcelFiles(files) {
             if (files.length === 0) return;
             
             const file = files[0];
-            const reader = new FileReader();
             
-            reader.onload = function(e) {
-                try {
-                    const data = e.target.result;
-                    parseExcelData(data);
-                } catch (error) {
-                    showMessage('dashboardMessage', translate('invalidExcelFormat'), 'error');
-                    console.error('Excel parsing error:', error);
-                }
-            };
+            if (file.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' &&
+                file.type !== 'application/vnd.ms-excel' &&
+                !file.name.match(/\.(xlsx|xls|csv)$/i)) {
+                showMessage('dashboardMessage', 'يرجى رفع ملف Excel صالح (xlsx, xls, csv)', 'error');
+                return;
+            }
             
-            reader.readAsBinaryString(file);
+            showMessage('dashboardMessage', 'جارٍ تحليل ملف Excel...', 'info');
+            
+            try {
+                const data = await readExcelFile(file);
+                await parseExcelData(data);
+            } catch (error) {
+                console.error('Excel parsing error:', error);
+                showMessage('dashboardMessage', 'حدث خطأ في قراءة ملف Excel. تأكد من صحة تنسيق الملف.', 'error');
+            }
         }
 
-        function parseExcelData(data) {
-            // بيانات تجريبية للعرض
-            excelData = [
-                {
-                    plateNumber: 'ABC 1234',
-                    previousProject: 'ارامكس/Aramex',
-                    currentProject: 'لا يوجد/No Vehicle',
-                    area: 'الرياض/Riyadh',
-                    action: translate('newEntry')
-                },
-                {
-                    plateNumber: 'DEF 5678',
-                    previousProject: 'لا يوجد/No Vehicle',
-                    currentProject: 'الببسي/Pepsi',
-                    area: 'الرياض/Riyadh',
-                    action: translate('updateExisting')
-                },
-                {
-                    plateNumber: 'GHI 9012',
-                    previousProject: 'لا يوجد/No Vehicle',
-                    currentProject: 'لا يوجد/No Vehicle',
-                    area: 'الدمام/Dammam',
-                    action: translate('newEntry')
+        function readExcelFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const data = e.target.result;
+                        const workbook = XLSX.read(data, { type: 'binary' });
+                        resolve(workbook);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                
+                reader.onerror = function(e) {
+                    reject(new Error('فشل في قراءة الملف'));
+                };
+                
+                reader.readAsBinaryString(file);
+            });
+        }
+
+        async function parseExcelData(workbook) {
+            try {
+                // جلب جميع المركبات الموجودة أولاً
+                const existingVehicles = await getAllVehicles();
+                
+                // استخدام الورقة الأولى
+                const firstSheet = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheet];
+                
+                // تحويل الورقة إلى JSON
+                const excelDataArray = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                
+                if (excelDataArray.length < 2) {
+                    showMessage('dashboardMessage', 'الملف لا يحتوي على بيانات', 'error');
+                    return;
                 }
-            ];
+                
+                // البحث عن عناوين الأعمدة
+                const headers = excelDataArray[0];
+                const dataRows = excelDataArray.slice(1);
+                
+                // تحديد أعمدة البيانات بناءً على العناوين
+                let plateCol = -1, prevProjectCol = -1, currProjectCol = -1, areaCol = -1, statusCol = -1;
+                
+                headers.forEach((header, index) => {
+                    const headerStr = String(header).toLowerCase();
+                    if (headerStr.includes('plate') || headerStr.includes('رقم') || headerStr.includes('لوحة')) {
+                        plateCol = index;
+                    } else if (headerStr.includes('previous') || headerStr.includes('سابق')) {
+                        prevProjectCol = index;
+                    } else if (headerStr.includes('current') || headerStr.includes('حالي')) {
+                        currProjectCol = index;
+                    } else if (headerStr.includes('area') || headerStr.includes('منطقة')) {
+                        areaCol = index;
+                    } else if (headerStr.includes('status') || headerStr.includes('حالة')) {
+                        statusCol = index;
+                    }
+                });
+                
+                // التحقق من وجود الأعمدة المطلوبة
+                if (plateCol === -1) {
+                    showMessage('dashboardMessage', 'لم يتم العثور على عمود "رقم اللوحة" في الملف', 'error');
+                    return;
+                }
+                
+                // معالجة البيانات
+                excelOriginalData = [];
+                excelData = [];
+                
+                for (let i = 0; i < dataRows.length; i++) {
+                    const row = dataRows[i];
+                    if (row.length === 0) continue;
+                    
+                    const plateNumber = String(row[plateCol] || '').trim();
+                    if (!plateNumber) continue;
+                    
+                    const previousProject = prevProjectCol !== -1 ? String(row[prevProjectCol] || '').trim() : 'لا يوجد/No Vehicle';
+                    const currentProject = currProjectCol !== -1 ? String(row[currProjectCol] || '').trim() : 'لا يوجد/No Vehicle';
+                    const area = areaCol !== -1 ? String(row[areaCol] || '').trim() : '';
+                    const vehicleStatus = statusCol !== -1 ? String(row[statusCol] || '').trim() : 'working';
+                    
+                    // التحقق من صحة رقم اللوحة
+                    if (!validatePlateNumber(plateNumber)) {
+                        continue;
+                    }
+                    
+                    const vehicleData = {
+                        plateNumber: plateNumber,
+                        previousProject: previousProject || 'لا يوجد/No Vehicle',
+                        currentProject: currentProject || 'لا يوجد/No Vehicle',
+                        area: area || '',
+                        vehicleStatus: vehicleStatus || 'working',
+                        action: existingVehicles[plateNumber] ? translate('updateExisting') : translate('newEntry')
+                    };
+                    
+                    excelOriginalData.push(vehicleData);
+                    excelData.push(vehicleData);
+                }
+                
+                if (excelData.length === 0) {
+                    showMessage('dashboardMessage', translate('noExcelData'), 'error');
+                    return;
+                }
+                
+                showExcelPreview();
+                showMessage('dashboardMessage', `تم تحليل ${excelData.length} مركبة من الملف`, 'success');
+                
+            } catch (error) {
+                console.error('Error parsing Excel:', error);
+                showMessage('dashboardMessage', translate('invalidExcelFormat'), 'error');
+            }
+        }
+
+        async function getAllVehicles() {
+            const vehiclesRef = database.ref('vehicles');
+            const snapshot = await vehiclesRef.once('value');
+            const vehicles = snapshot.val();
+            const vehicleMap = {};
             
-            showExcelPreview();
+            if (vehicles) {
+                Object.values(vehicles).forEach(vehicle => {
+                    if (vehicle.plateNumber) {
+                        vehicleMap[vehicle.plateNumber] = vehicle;
+                    }
+                });
+            }
+            
+            existingVehiclesMap = vehicleMap;
+            return vehicleMap;
         }
 
         function showExcelPreview() {
@@ -2626,100 +3476,79 @@
             
             previewBody.innerHTML = '';
             
+            let newEntries = 0;
+            let updateEntries = 0;
+            
             excelData.forEach((row, index) => {
                 const tr = document.createElement('tr');
+                
+                // تحديد إذا كانت إدخال جديد أو تحديث
+                const isUpdate = row.action === translate('updateExisting');
+                if (isUpdate) {
+                    updateEntries++;
+                } else {
+                    newEntries++;
+                }
+                
+                // التحقق من المناطق والمشاريع
+                const areaWarning = !row.area ? '⚠️ منطقة مفقودة' : '';
+                const projectWarning = (!row.previousProject && !row.currentProject) ? '⚠️ مشروع مفقود' : '';
+                const statusWarning = !row.vehicleStatus ? '⚠️ حالة مفقودة' : '';
+                
                 tr.innerHTML = `
-                    <td>${row.plateNumber}</td>
-                    <td>${row.previousProject}</td>
-                    <td>${row.currentProject}</td>
-                    <td>${row.area}</td>
-                    <td><span class="status-badge ${row.action === translate('newEntry') ? 'status-active' : 'status-warning'}">${row.action}</span></td>
+                    <td><strong>${row.plateNumber}</strong></td>
+                    <td>${row.previousProject || 'لا يوجد/No Vehicle'}</td>
+                    <td>${row.currentProject || 'لا يوجد/No Vehicle'}</td>
+                    <td>${row.area || 'غير محدد'}</td>
+                    <td>${row.vehicleStatus || 'working'}</td>
+                    <td><span class="status-badge ${isUpdate ? 'status-warning' : 'status-active'}">${row.action}</span></td>
+                    <td style="color: ${areaWarning || projectWarning || statusWarning ? '#ff9800' : '#4caf50'}; font-size: 0.85rem;">
+                        ${areaWarning} ${projectWarning ? '<br>' + projectWarning : ''} ${statusWarning ? '<br>' + statusWarning : ''}
+                    </td>
                 `;
                 previewBody.appendChild(tr);
             });
             
+            // تحديث الإحصائيات
+            document.getElementById('vehicleCount').textContent = excelData.length;
+            document.getElementById('newEntriesCount').textContent = newEntries;
+            document.getElementById('updateEntriesCount').textContent = updateEntries;
+            
             document.getElementById('excelPreview').style.display = 'block';
-            showMessage('dashboardMessage', translate('excelUploaded'), 'success');
+            document.getElementById('excelPreview').scrollIntoView({ behavior: 'smooth' });
         }
 
         async function uploadExcelData() {
-            const now = new Date();
-            
-            for (const vehicle of excelData) {
-                // التحقق من رقم اللوحة
-                if (!validatePlateNumber(vehicle.plateNumber)) {
-                    continue;
-                }
-                
-                const vehicleData = {
-                    ...vehicle,
-                    createdBy: currentUser.username,
-                    createdAt: now.toISOString(),
-                    lastUpdatedBy: currentUser.username,
-                    lastUpdatedAt: now.toISOString(),
-                    updateHistory: [{
-                        updatedBy: currentUser.username,
-                        updatedAt: now.toISOString(),
-                        changes: "Uploaded via Excel"
-                    }]
-                };
-                
-                const vehiclesRef = database.ref('vehicles');
-                await vehiclesRef.push(vehicleData);
+            if (excelData.length === 0) {
+                showMessage('dashboardMessage', 'لا توجد بيانات لرفعها', 'error');
+                return;
             }
             
-            showMessage('dashboardMessage', translate('excelDataUploaded'), 'success');
-            document.getElementById('excelPreview').style.display = 'none';
-            document.getElementById('excelFileInput').value = '';
-            excelData = [];
-            loadVehicleRecords();
+            showMessage('dashboardMessage', 'جارٍ رفع البيانات...', 'info');
             
-            // تحديث بيانات المستخدمين تلقائياً للمسؤول
-            if (currentUser.role === 'admin') {
-                loadUserVehicleData();
-            }
-        }
-
-        async function updateExcelData() {
             const now = new Date();
+            let successCount = 0;
+            let errorCount = 0;
             
             for (const vehicle of excelData) {
-                // التحقق من رقم اللوحة
-                if (!validatePlateNumber(vehicle.plateNumber)) {
-                    continue;
-                }
-                
-                const vehiclesRef = database.ref('vehicles');
-                const snapshot = await vehiclesRef.orderByChild('plateNumber').equalTo(vehicle.plateNumber).once('value');
-                const existingVehicles = snapshot.val();
-                
-                if (existingVehicles) {
-                    const vehicleKey = Object.keys(existingVehicles)[0];
-                    const vehicleRef = database.ref('vehicles/' + vehicleKey);
-                    const currentVehicle = existingVehicles[vehicleKey];
+                try {
+                    // التحقق من رقم اللوحة
+                    if (!validatePlateNumber(vehicle.plateNumber)) {
+                        errorCount++;
+                        continue;
+                    }
                     
-                    const updates = {
-                        previousProject: vehicle.previousProject,
-                        currentProject: vehicle.currentProject,
-                        area: vehicle.area,
-                        lastUpdatedBy: currentUser.username,
-                        lastUpdatedAt: now.toISOString()
-                    };
+                    // استخدام اسم المنطقة الموجود أو "غير محدد"
+                    const areaToUse = vehicle.area || 'غير محدد/Undefined';
+                    const statusToUse = vehicle.vehicleStatus || 'working';
                     
-                    const updateEntry = {
-                        updatedBy: currentUser.username,
-                        updatedAt: now.toISOString(),
-                        changes: `Updated via Excel by ${currentUser.username}`
-                    };
-                    
-                    const updateHistory = currentVehicle.updateHistory || [];
-                    updateHistory.push(updateEntry);
-                    updates.updateHistory = updateHistory;
-                    
-                    await vehicleRef.update(updates);
-                } else {
                     const vehicleData = {
-                        ...vehicle,
+                        plateNumber: vehicle.plateNumber,
+                        previousProject: vehicle.previousProject || 'لا يوجد/No Vehicle',
+                        currentProject: vehicle.currentProject || 'لا يوجد/No Vehicle',
+                        area: areaToUse,
+                        vehicleStatus: statusToUse,
+                        additionalInfo: '',
                         createdBy: currentUser.username,
                         createdAt: now.toISOString(),
                         lastUpdatedBy: currentUser.username,
@@ -2727,23 +3556,272 @@
                         updateHistory: [{
                             updatedBy: currentUser.username,
                             updatedAt: now.toISOString(),
-                            changes: "Created via Excel"
+                            changes: "Uploaded via Excel"
                         }]
                     };
                     
+                    const vehiclesRef = database.ref('vehicles');
                     await vehiclesRef.push(vehicleData);
+                    successCount++;
+                    
+                } catch (error) {
+                    console.error('Error uploading vehicle:', error);
+                    errorCount++;
                 }
             }
             
-            showMessage('dashboardMessage', translate('excelDataUpdated'), 'success');
+            showMessage('dashboardMessage', 
+                `تم رفع ${successCount} مركبة بنجاح${errorCount > 0 ? `، فشل رفع ${errorCount} مركبة` : ''}`, 
+                successCount > 0 ? 'success' : 'error'
+            );
+            
             document.getElementById('excelPreview').style.display = 'none';
             document.getElementById('excelFileInput').value = '';
             excelData = [];
             loadVehicleRecords();
             
-            // تحديث بيانات المستخدمين تلقائياً للمسؤول
             if (currentUser.role === 'admin') {
                 loadUserVehicleData();
+            }
+        }
+
+        async function updateExcelData() {
+            if (excelData.length === 0) {
+                showMessage('dashboardMessage', 'لا توجد بيانات لتحديثها', 'error');
+                return;
+            }
+            
+            showMessage('dashboardMessage', 'جارٍ تحديث البيانات...', 'info');
+            
+            const now = new Date();
+            let successCount = 0;
+            let errorCount = 0;
+            
+            for (const vehicle of excelData) {
+                try {
+                    // التحقق من رقم اللوحة
+                    if (!validatePlateNumber(vehicle.plateNumber)) {
+                        errorCount++;
+                        continue;
+                    }
+                    
+                    const vehiclesRef = database.ref('vehicles');
+                    const snapshot = await vehiclesRef.orderByChild('plateNumber').equalTo(vehicle.plateNumber).once('value');
+                    const existingVehicles = snapshot.val();
+                    
+                    const areaToUse = vehicle.area || 'غير محدد/Undefined';
+                    const statusToUse = vehicle.vehicleStatus || 'working';
+                    
+                    if (existingVehicles) {
+                        // تحديث المركبة الموجودة
+                        const vehicleKey = Object.keys(existingVehicles)[0];
+                        const vehicleRef = database.ref('vehicles/' + vehicleKey);
+                        const currentVehicle = existingVehicles[vehicleKey];
+                        
+                        const updates = {
+                            previousProject: vehicle.previousProject || 'لا يوجد/No Vehicle',
+                            currentProject: vehicle.currentProject || 'لا يوجد/No Vehicle',
+                            area: areaToUse,
+                            vehicleStatus: statusToUse,
+                            lastUpdatedBy: currentUser.username,
+                            lastUpdatedAt: now.toISOString()
+                        };
+                        
+                        const updateEntry = {
+                            updatedBy: currentUser.username,
+                            updatedAt: now.toISOString(),
+                            changes: `Updated via Excel by ${currentUser.username}`
+                        };
+                        
+                        const updateHistory = currentVehicle.updateHistory || [];
+                        updateHistory.push(updateEntry);
+                        updates.updateHistory = updateHistory;
+                        
+                        await vehicleRef.update(updates);
+                        successCount++;
+                        
+                    } else {
+                        // إضافة مركبة جديدة
+                        const vehicleData = {
+                            plateNumber: vehicle.plateNumber,
+                            previousProject: vehicle.previousProject || 'لا يوجد/No Vehicle',
+                            currentProject: vehicle.currentProject || 'لا يوجد/No Vehicle',
+                            area: areaToUse,
+                            vehicleStatus: statusToUse,
+                            additionalInfo: '',
+                            createdBy: currentUser.username,
+                            createdAt: now.toISOString(),
+                            lastUpdatedBy: currentUser.username,
+                            lastUpdatedAt: now.toISOString(),
+                            updateHistory: [{
+                                updatedBy: currentUser.username,
+                                updatedAt: now.toISOString(),
+                                changes: "Created via Excel"
+                            }]
+                        };
+                        
+                        await vehiclesRef.push(vehicleData);
+                        successCount++;
+                    }
+                    
+                } catch (error) {
+                    console.error('Error updating vehicle:', error);
+                    errorCount++;
+                }
+            }
+            
+            showMessage('dashboardMessage', 
+                `تم تحديث/إضافة ${successCount} مركبة بنجاح${errorCount > 0 ? `، فشل ${errorCount} مركبة` : ''}`, 
+                successCount > 0 ? 'success' : 'error'
+            );
+            
+            document.getElementById('excelPreview').style.display = 'none';
+            document.getElementById('excelFileInput').value = '';
+            excelData = [];
+            loadVehicleRecords();
+            
+            if (currentUser.role === 'admin') {
+                loadUserVehicleData();
+            }
+        }
+
+        // تحميل قالب Excel
+        function downloadExcelTemplate() {
+            const headers = [
+                ['رقم اللوحة/Plate Number', 'المشروع السابق/Previous Project', 'المشروع الحالي/Current Project', 'المنطقة/Area', 'حالة المركبة/Vehicle Status'],
+                ['ABC 1234', 'ارامكس/Aramex', 'كيمارت/Kimart', 'الرياض/Riyadh', 'تعمل/Working'],
+                ['XYZ 5678', 'لا يوجد/No Vehicle', 'الببسي/Pepsi', 'جدة/Jeddah', 'متوقفة/Stopped']
+            ];
+            
+            const ws = XLSX.utils.aoa_to_sheet(headers);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "قائمة المركبات");
+            
+            // تعيين عرض الأعمدة
+            const wscols = [
+                {wch: 15}, // رقم اللوحة
+                {wch: 25}, // المشروع السابق
+                {wch: 25}, // المشروع الحالي
+                {wch: 20}, // المنطقة
+                {wch: 15}  // حالة المركبة
+            ];
+            ws['!cols'] = wscols;
+            
+            // تحميل الملف
+            XLSX.writeFile(wb, `قالب_المركبات_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        // تحميل قالب Excel مع البيانات الحالية
+        async function downloadExcelTemplateWithData() {
+            try {
+                const vehiclesRef = database.ref('vehicles');
+                const snapshot = await vehiclesRef.once('value');
+                const vehicles = snapshot.val();
+                
+                const headers = [['رقم اللوحة/Plate Number', 'المشروع السابق/Previous Project', 'المشروع الحالي/Current Project', 'المنطقة/Area', 'حالة المركبة/Vehicle Status']];
+                const data = [];
+                
+                if (vehicles) {
+                    Object.values(vehicles).forEach(vehicle => {
+                        data.push([
+                            vehicle.plateNumber || '',
+                            vehicle.previousProject || 'لا يوجد/No Vehicle',
+                            vehicle.currentProject || 'لا يوجد/No Vehicle',
+                            vehicle.area || '',
+                            vehicle.vehicleStatus || 'working'
+                        ]);
+                    });
+                }
+                
+                const allData = headers.concat(data);
+                const ws = XLSX.utils.aoa_to_sheet(allData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "المركبات");
+                
+                // تعيين عرض الأعمدة
+                const wscols = [
+                    {wch: 15},
+                    {wch: 25},
+                    {wch: 25},
+                    {wch: 20},
+                    {wch: 15}
+                ];
+                ws['!cols'] = wscols;
+                
+                // تحميل الملف
+                XLSX.writeFile(wb, `مركبات_${new Date().toISOString().slice(0,10)}.xlsx`);
+                showMessage('dashboardMessage', 'تم تحميل ملف Excel بنجاح', 'success');
+                
+            } catch (error) {
+                console.error('Error downloading Excel:', error);
+                showMessage('dashboardMessage', 'حدث خطأ أثناء تحميل الملف', 'error');
+            }
+        }
+
+        // تحميل جميع السجلات كملف Excel
+        async function downloadAllRecords() {
+            try {
+                const vehiclesRef = database.ref('vehicles');
+                const snapshot = await vehiclesRef.once('value');
+                const vehicles = snapshot.val();
+                
+                const headers = [[
+                    'رقم اللوحة/Plate Number',
+                    'المنطقة/Area',
+                    'المشروع السابق/Previous Project',
+                    'المشروع الحالي/Current Project',
+                    'حالة المركبة/Vehicle Status',
+                    'آخر تحديث/Last Update',
+                    'محدث بواسطة/Updated By',
+                    'تاريخ الإنشاء/Created At',
+                    'أنشئ بواسطة/Created By'
+                ]];
+                
+                const data = [];
+                
+                if (vehicles) {
+                    Object.values(vehicles).forEach(vehicle => {
+                        const lastUpdate = vehicle.lastUpdatedAt ? 
+                            new Date(vehicle.lastUpdatedAt).toLocaleString('ar-SA') : 
+                            'غير معروف';
+                        const createdAt = vehicle.createdAt ? 
+                            new Date(vehicle.createdAt).toLocaleString('ar-SA') : 
+                            'غير معروف';
+                        
+                        data.push([
+                            vehicle.plateNumber || '',
+                            vehicle.area || '',
+                            vehicle.previousProject || 'لا يوجد/No Vehicle',
+                            vehicle.currentProject || 'لا يوجد/No Vehicle',
+                            vehicle.vehicleStatus === 'working' ? 'تعمل/Working' : 'متوقفة/Stopped',
+                            lastUpdate,
+                            vehicle.lastUpdatedBy || vehicle.createdBy || '',
+                            createdAt,
+                            vehicle.createdBy || ''
+                        ]);
+                    });
+                }
+                
+                const allData = headers.concat(data);
+                const ws = XLSX.utils.aoa_to_sheet(allData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "سجلات المركبات");
+                
+                // تعيين عرض الأعمدة
+                const wscols = [
+                    {wch: 15}, {wch: 20}, {wch: 25}, {wch: 25},
+                    {wch: 15}, {wch: 25}, {wch: 20}, {wch: 25}, {wch: 20}
+                ];
+                ws['!cols'] = wscols;
+                
+                // تحميل الملف
+                const filename = `سجلات_المركبات_${new Date().toISOString().slice(0,10)}.xlsx`;
+                XLSX.writeFile(wb, filename);
+                showMessage('dashboardMessage', `تم تحميل ${data.length} سجل بنجاح`, 'success');
+                
+            } catch (error) {
+                console.error('Error downloading records:', error);
+                showMessage('dashboardMessage', 'حدث خطأ أثناء تحميل السجلات', 'error');
             }
         }
 
@@ -2768,6 +3846,8 @@
             document.getElementById('dashboard').style.display = 'block';
             updateUserInfo();
             loadVehicleRecords();
+            loadVehicleStatusHistory();
+            loadChipRequests();
             
             const adminElements = document.querySelectorAll('.admin-only');
             if (currentUser.role === 'admin') {
@@ -2775,6 +3855,7 @@
                 loadPendingApprovals();
                 loadAllUsers();
                 loadUserVehicleData();
+                loadAdminChipRequests();
             } else {
                 adminElements.forEach(el => el.style.display = 'none');
             }
@@ -2837,7 +3918,7 @@
             const recordsBody = document.getElementById('recordsBody');
             if (!recordsBody) return;
             
-            recordsBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">جارٍ تحميل السجلات...</td></tr>';
+            recordsBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;">جارٍ تحميل السجلات...</td></tr>';
             
             const vehiclesRef = database.ref('vehicles');
             const snapshot = await vehiclesRef.once('value');
@@ -2852,12 +3933,17 @@
                         new Date(vehicle.lastUpdatedAt).toLocaleString(currentLanguage === 'ar' ? 'ar-SA' : 'en-US') : 
                         new Date(vehicle.createdAt).toLocaleString(currentLanguage === 'ar' ? 'ar-SA' : 'en-US');
                     
+                    const statusBadge = vehicle.vehicleStatus === 'working' ? 
+                        '<span class="status-badge status-working">تعمل/Working</span>' : 
+                        '<span class="status-badge status-stopped">متوقفة/Stopped</span>';
+                    
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td><strong>${vehicle.plateNumber}</strong></td>
                         <td>${vehicle.area}</td>
                         <td>${vehicle.previousProject}</td>
                         <td>${vehicle.currentProject}</td>
+                        <td>${statusBadge}</td>
                         <td><span class="timestamp-cell">${lastUpdate}</span></td>
                         <td>${vehicle.lastUpdatedBy || vehicle.createdBy}</td>
                         <td>
@@ -2876,7 +3962,7 @@
                     recordsBody.appendChild(row);
                 });
             } else {
-                recordsBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">لا توجد سجلات مركبات</td></tr>`;
+                recordsBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 40px;">لا توجد سجلات مركبات</td></tr>`;
             }
             
             updateFilterDropdowns(vehicles);
@@ -2919,29 +4005,34 @@
         function filterRecords() {
             const areaFilter = document.getElementById('filterArea');
             const projectFilter = document.getElementById('filterProject');
+            const statusFilter = document.getElementById('filterStatus');
             const searchText = document.getElementById('searchPlate');
             
             if (!areaFilter || !projectFilter || !searchText) return;
             
             const areaValue = areaFilter.value;
             const projectValue = projectFilter.value;
+            const statusValue = statusFilter.value;
             const searchValue = searchText.value.toLowerCase();
             
             const rows = document.querySelectorAll('#recordsBody tr');
             
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
-                if (cells.length < 6) return;
+                if (cells.length < 7) return;
                 
                 const area = cells[1].textContent;
                 const project = cells[3].textContent;
                 const plate = cells[0].textContent.toLowerCase();
+                const statusBadge = cells[4].querySelector('.status-badge');
+                const status = statusBadge ? (statusBadge.textContent.includes('تعمل') ? 'working' : 'stopped') : '';
                 
                 const areaMatch = !areaValue || area === areaValue;
                 const projectMatch = !projectValue || project === projectValue;
+                const statusMatch = !statusValue || status === statusValue;
                 const searchMatch = !searchValue || plate.includes(searchValue);
                 
-                row.style.display = areaMatch && projectMatch && searchMatch ? '' : 'none';
+                row.style.display = areaMatch && projectMatch && statusMatch && searchMatch ? '' : 'none';
             });
         }
 
@@ -2966,6 +4057,9 @@
             
             document.getElementById('editPrevProject').value = vehicle.previousProject || '';
             document.getElementById('editCurrProject').value = vehicle.currentProject || '';
+            
+            const statusSelect = document.getElementById('editVehicleStatus');
+            statusSelect.value = vehicle.vehicleStatus || '';
             
             setTimeout(() => {
                 const editPrevList = document.getElementById('editPrevProjectsList');
@@ -3003,6 +4097,224 @@
                     loadUserVehicleData();
                 }
             }
+        }
+
+        // تحميل سجل حالات المركبات
+        async function loadVehicleStatusHistory() {
+            const historyBody = document.getElementById('statusHistoryBody');
+            if (!historyBody) return;
+            
+            historyBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px;">جارٍ التحميل...</td></tr>';
+            
+            const statusHistoryRef = database.ref('vehicleStatusHistory');
+            const snapshot = await statusHistoryRef.orderByChild('updatedAt').limitToLast(50).once('value');
+            const statusHistory = snapshot.val();
+            
+            historyBody.innerHTML = '';
+            
+            if (statusHistory) {
+                // تحويل إلى مصفوفة وفرز حسب التاريخ
+                const historyArray = Object.values(statusHistory).sort((a, b) => 
+                    new Date(b.updatedAt) - new Date(a.updatedAt)
+                );
+                
+                historyArray.forEach(entry => {
+                    const updateDate = entry.updatedAt ? 
+                        new Date(entry.updatedAt).toLocaleString(currentLanguage === 'ar' ? 'ar-SA' : 'en-US') : 
+                        'غير معروف';
+                    
+                    const statusText = entry.vehicleStatus === 'working' ? 
+                        '<span class="status-badge status-working">تعمل/Working</span>' : 
+                        '<span class="status-badge status-stopped">متوقفة/Stopped</span>';
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${entry.plateNumber}</strong></td>
+                        <td>${statusText}</td>
+                        <td>${entry.statusNotes || 'لا توجد ملاحظات'}</td>
+                        <td>${entry.updatedBy}</td>
+                        <td><span class="timestamp-cell">${updateDate}</span></td>
+                    `;
+                    historyBody.appendChild(row);
+                });
+            } else {
+                historyBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px;">لا توجد تحديثات حالات</td></tr>`;
+            }
+        }
+
+        // تحميل طلبات الشرائح
+        async function loadChipRequests() {
+            const requestsBody = document.getElementById('chipRequestsBody');
+            if (!requestsBody) return;
+            
+            requestsBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px;">جارٍ التحميل...</td></tr>';
+            
+            const chipRequestsRef = database.ref('chipRequests');
+            const snapshot = await chipRequestsRef.orderByChild('requestedAt').limitToLast(20).once('value');
+            const chipRequests = snapshot.val();
+            
+            requestsBody.innerHTML = '';
+            
+            if (chipRequests) {
+                // تحويل إلى مصفوفة وفرز حسب التاريخ
+                const requestsArray = Object.values(chipRequests).sort((a, b) => 
+                    new Date(b.requestedAt) - new Date(a.requestedAt)
+                );
+                
+                requestsArray.forEach(request => {
+                    const requestDate = request.requestedAt ? 
+                        new Date(request.requestedAt).toLocaleString(currentLanguage === 'ar' ? 'ar-SA' : 'en-US') : 
+                        'غير معروف';
+                    
+                    const urgentBadge = request.urgentRequest ? 
+                        '<span class="status-badge status-pending">عاجل/Urgent</span>' : 
+                        '<span class="status-badge status-active">عادي/Normal</span>';
+                    
+                    const statusBadge = request.requestStatus === 'pending' ? 
+                        '<span class="status-badge status-pending">قيد الانتظار/Pending</span>' : 
+                        request.requestStatus === 'approved' ? 
+                        '<span class="status-badge status-active">معتمدة/Approved</span>' : 
+                        '<span class="status-badge status-inactive">${request.requestStatus}</span>';
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${request.plateNumber}</strong></td>
+                        <td>${request.requestType}</td>
+                        <td>${request.currentChipNumber || 'غير محدد'}</td>
+                        <td>${request.requestNotes || 'لا توجد ملاحظات'}</td>
+                        <td>${urgentBadge}</td>
+                        <td>${statusBadge}</td>
+                        <td>${request.requestedBy}</td>
+                        <td><span class="timestamp-cell">${requestDate}</span></td>
+                    `;
+                    requestsBody.appendChild(row);
+                });
+            } else {
+                requestsBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 40px;">لا توجد طلبات شرائح</td></tr>`;
+            }
+        }
+
+        // تحميل طلبات الشرائح للمسؤول
+        async function loadAdminChipRequests() {
+            const requestsBody = document.getElementById('adminChipRequestsBody');
+            if (!requestsBody) return;
+            
+            requestsBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 30px;">جارٍ التحميل...</td></tr>';
+            
+            const chipRequestsRef = database.ref('chipRequests');
+            const snapshot = await chipRequestsRef.once('value');
+            const chipRequests = snapshot.val();
+            
+            requestsBody.innerHTML = '';
+            let requestsCount = 0;
+            
+            if (chipRequests) {
+                requestsCount = Object.keys(chipRequests).length;
+                
+                // تحويل إلى مصفوفة وفرز حسب التاريخ
+                const requestsArray = Object.values(chipRequests).sort((a, b) => 
+                    new Date(b.requestedAt) - new Date(a.requestedAt)
+                );
+                
+                requestsArray.forEach((request, index) => {
+                    const requestId = Object.keys(chipRequests)[index];
+                    const requestDate = request.requestedAt ? 
+                        new Date(request.requestedAt).toLocaleString(currentLanguage === 'ar' ? 'ar-SA' : 'en-US') : 
+                        'غير معروف';
+                    
+                    const urgentBadge = request.urgentRequest ? 
+                        '<span class="status-badge status-pending">عاجل/Urgent</span>' : 
+                        '<span class="status-badge status-active">عادي/Normal</span>';
+                    
+                    const statusBadge = request.requestStatus === 'pending' ? 
+                        '<span class="status-badge status-pending">قيد الانتظار/Pending</span>' : 
+                        request.requestStatus === 'approved' ? 
+                        '<span class="status-badge status-active">معتمدة/Approved</span>' : 
+                        request.requestStatus === 'rejected' ? 
+                        '<span class="status-badge status-inactive">مرفوضة/Rejected</span>' :
+                        '<span class="status-badge status-success">مكتملة/Completed</span>';
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>${request.plateNumber}</strong></td>
+                        <td>${request.requestType}</td>
+                        <td>${request.currentChipNumber || 'غير محدد'}</td>
+                        <td>${request.requestNotes || 'لا توجد ملاحظات'}</td>
+                        <td>${urgentBadge}</td>
+                        <td>${request.requestedBy}</td>
+                        <td><span class="timestamp-cell">${requestDate}</span></td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <div class="action-buttons">
+                                ${request.requestStatus === 'pending' ? `
+                                    <button class="action-btn approve-btn" onclick="updateChipRequestStatus('${requestId}', 'approved')">
+                                        <i class="fas fa-check"></i> ${translate('approve')}
+                                    </button>
+                                    <button class="action-btn delete-btn" onclick="updateChipRequestStatus('${requestId}', 'rejected')">
+                                        <i class="fas fa-times"></i> رفض
+                                    </button>
+                                ` : request.requestStatus === 'approved' ? `
+                                    <button class="action-btn approve-btn" onclick="updateChipRequestStatus('${requestId}', 'completed')">
+                                        <i class="fas fa-check-double"></i> إكمال
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    `;
+                    requestsBody.appendChild(row);
+                });
+            } else {
+                requestsBody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 40px;">لا توجد طلبات شرائح</td></tr>`;
+            }
+            
+            document.getElementById('chipRequestsCount').textContent = requestsCount;
+        }
+
+        // تحديث حالة طلب الشريحة
+        async function updateChipRequestStatus(requestId, status) {
+            const requestRef = database.ref('chipRequests/' + requestId);
+            await requestRef.update({ 
+                requestStatus: status,
+                processedBy: currentUser.username,
+                processedAt: new Date().toISOString()
+            });
+            
+            showMessage('dashboardMessage', translate('chipRequestUpdated'), 'success');
+            loadAdminChipRequests();
+            loadChipRequests();
+        }
+
+        // تصفية طلبات الشرائح
+        function filterChipRequests() {
+            const statusFilter = document.getElementById('filterChipStatus');
+            const urgentFilter = document.getElementById('filterUrgent');
+            
+            if (!statusFilter || !urgentFilter) return;
+            
+            const statusValue = statusFilter.value;
+            const urgentValue = urgentFilter.value;
+            
+            const rows = document.querySelectorAll('#adminChipRequestsBody tr');
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length < 8) return;
+                
+                const statusCell = cells[7];
+                const status = statusCell.textContent.includes('قيد الانتظار') ? 'pending' : 
+                              statusCell.textContent.includes('معتمدة') ? 'approved' :
+                              statusCell.textContent.includes('مرفوضة') ? 'rejected' : 'completed';
+                
+                const urgentCell = cells[4];
+                const isUrgent = urgentCell.textContent.includes('عاجل');
+                
+                const statusMatch = !statusValue || status === statusValue;
+                const urgentMatch = !urgentValue || 
+                    (urgentValue === 'yes' && isUrgent) || 
+                    (urgentValue === 'no' && !isUrgent);
+                
+                row.style.display = statusMatch && urgentMatch ? '' : 'none';
+            });
         }
 
         function closeModal() {
@@ -3131,32 +4443,38 @@
 
         function updateUserFilterDropdown(users) {
             const userFilter = document.getElementById('filterUserVehicles');
-            if (!userFilter) return;
+            const adminUserFilter = document.getElementById('filterAdminUser');
             
-            userFilter.innerHTML = `<option value="" data-i18n="allUsers">${translate('allUsers')}</option>`;
+            const filters = [userFilter, adminUserFilter];
             
-            if (users) {
-                const uniqueUsers = new Set();
-                Object.values(users).forEach(user => {
-                    if (user.username && user.username !== 'هوندا' && user.username !== 'Honda') {
-                        uniqueUsers.add(user.username);
-                    }
-                });
+            filters.forEach(filter => {
+                if (!filter) return;
                 
-                uniqueUsers.forEach(username => {
-                    const option = document.createElement('option');
-                    option.value = username;
-                    option.textContent = username;
-                    userFilter.appendChild(option);
-                });
-            }
+                filter.innerHTML = `<option value="" data-i18n="allUsers">${translate('allUsers')}</option>`;
+                
+                if (users) {
+                    const uniqueUsers = new Set();
+                    Object.values(users).forEach(user => {
+                        if (user.username && user.username !== 'هوندا' && user.username !== 'Honda') {
+                            uniqueUsers.add(user.username);
+                        }
+                    });
+                    
+                    uniqueUsers.forEach(username => {
+                        const option = document.createElement('option');
+                        option.value = username;
+                        option.textContent = username;
+                        filter.appendChild(option);
+                    });
+                }
+            });
         }
 
         async function loadUserVehicleData() {
             const userVehicleDataBody = document.getElementById('userVehicleDataBody');
             if (!userVehicleDataBody) return;
             
-            userVehicleDataBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px;">جارٍ التحميل...</td></tr>';
+            userVehicleDataBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px;">جارٍ التحميل...</td></tr>';
             
             const vehiclesRef = database.ref('vehicles');
             const snapshot = await vehiclesRef.once('value');
@@ -3180,6 +4498,10 @@
                         return `${index + 1}. ${date} - ${entry.updatedBy}: ${entry.changes || 'No details'}`;
                     }).join('<br>');
                     
+                    const statusBadge = vehicle.vehicleStatus === 'working' ? 
+                        '<span class="status-badge status-working">تعمل/Working</span>' : 
+                        '<span class="status-badge status-stopped">متوقفة/Stopped</span>';
+                    
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td><strong>${vehicle.createdBy || 'Unknown'}</strong></td>
@@ -3187,6 +4509,7 @@
                         <td>${vehicle.area}</td>
                         <td>${vehicle.previousProject}</td>
                         <td>${vehicle.currentProject}</td>
+                        <td>${statusBadge}</td>
                         <td><span class="timestamp-cell">${lastUpdate}</span></td>
                         <td><div style="max-height: 100px; overflow-y: auto; font-size: 0.85rem;">${historyText || 'لا يوجد سجل تحديثات'}</div></td>
                     `;
@@ -3197,7 +4520,7 @@
             document.getElementById('vehicleDataCount').textContent = vehicleDataCount;
             
             if (vehicleDataCount === 0) {
-                userVehicleDataBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">لا توجد بيانات مركبات</td></tr>`;
+                userVehicleDataBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 40px;">لا توجد بيانات مركبات</td></tr>`;
             }
         }
 
@@ -3214,16 +4537,36 @@
             
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
-                if (cells.length < 7) return;
+                if (cells.length < 8) return;
                 
                 const username = cells[0].textContent.trim();
-                const lastUpdateCell = cells[5].querySelector('.timestamp-cell');
+                const lastUpdateCell = cells[6].querySelector('.timestamp-cell');
                 const lastUpdate = lastUpdateCell ? lastUpdateCell.textContent : '';
                 
                 const userMatch = !selectedUser || username === selectedUser;
                 const dateMatch = !selectedDate || lastUpdate.includes(selectedDate);
                 
                 row.style.display = userMatch && dateMatch ? '' : 'none';
+            });
+        }
+
+        // تصفية بيانات المستخدمين في لوحة المسؤول
+        function filterAdminUserData() {
+            const userFilter = document.getElementById('filterAdminUser');
+            if (!userFilter) return;
+            
+            const selectedUser = userFilter.value;
+            
+            const rows = document.querySelectorAll('#usersBody tr');
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length < 6) return;
+                
+                const username = cells[0].textContent.trim();
+                const userMatch = !selectedUser || username === selectedUser;
+                
+                row.style.display = userMatch ? '' : 'none';
             });
         }
 
@@ -3262,6 +4605,382 @@
                 showMessage('dashboardMessage', translate('userDeleted'), 'success');
                 loadPendingApprovals();
                 loadAllUsers();
+            }
+        }
+
+        // تحميل جميع البيانات كملف Excel
+        async function downloadAllDataExcel() {
+            try {
+                // جلب جميع البيانات
+                const vehiclesRef = database.ref('vehicles');
+                const usersRef = database.ref('users');
+                const chipRequestsRef = database.ref('chipRequests');
+                
+                const [vehiclesSnapshot, usersSnapshot, chipRequestsSnapshot] = await Promise.all([
+                    vehiclesRef.once('value'),
+                    usersRef.once('value'),
+                    chipRequestsRef.once('value')
+                ]);
+                
+                const vehicles = vehiclesSnapshot.val();
+                const users = usersSnapshot.val();
+                const chipRequests = chipRequestsSnapshot.val();
+                
+                // إنشاء مصنف Excel متعدد الأوراق
+                const wb = XLSX.utils.book_new();
+                
+                // 1. ورقة المركبات
+                const vehiclesHeaders = [[
+                    'رقم اللوحة/Plate Number',
+                    'المنطقة/Area',
+                    'المشروع السابق/Previous Project',
+                    'المشروع الحالي/Current Project',
+                    'حالة المركبة/Vehicle Status',
+                    'معلومات إضافية/Additional Info',
+                    'أنشئ بواسطة/Created By',
+                    'تاريخ الإنشاء/Created At',
+                    'آخر تحديث بواسطة/Last Updated By',
+                    'آخر تحديث/Last Updated At'
+                ]];
+                
+                const vehiclesData = [];
+                if (vehicles) {
+                    Object.values(vehicles).forEach(vehicle => {
+                        vehiclesData.push([
+                            vehicle.plateNumber || '',
+                            vehicle.area || '',
+                            vehicle.previousProject || '',
+                            vehicle.currentProject || '',
+                            vehicle.vehicleStatus === 'working' ? 'تعمل/Working' : 'متوقفة/Stopped',
+                            vehicle.additionalInfo || '',
+                            vehicle.createdBy || '',
+                            vehicle.createdAt ? new Date(vehicle.createdAt).toLocaleString('ar-SA') : '',
+                            vehicle.lastUpdatedBy || '',
+                            vehicle.lastUpdatedAt ? new Date(vehicle.lastUpdatedAt).toLocaleString('ar-SA') : ''
+                        ]);
+                    });
+                }
+                
+                const vehiclesSheet = XLSX.utils.aoa_to_sheet(vehiclesHeaders.concat(vehiclesData));
+                XLSX.utils.book_append_sheet(wb, vehiclesSheet, "المركبات");
+                
+                // 2. ورقة المستخدمين
+                const usersHeaders = [[
+                    'اسم المستخدم/Username',
+                    'كلمة المرور/Password',
+                    'المشروع/Project',
+                    'المنطقة/Area',
+                    'الدور/Role',
+                    'الحالة/Status',
+                    'تاريخ التسجيل/Registration Date',
+                    'آخر دخول/Last Login'
+                ]];
+                
+                const usersData = [];
+                if (users) {
+                    Object.values(users).forEach(user => {
+                        usersData.push([
+                            user.username || '',
+                            user.password || '',
+                            user.project || '',
+                            user.area || '',
+                            user.role || '',
+                            user.status || '',
+                            user.createdAt ? new Date(user.createdAt).toLocaleString('ar-SA') : '',
+                            user.lastLogin ? new Date(user.lastLogin).toLocaleString('ar-SA') : ''
+                        ]);
+                    });
+                }
+                
+                const usersSheet = XLSX.utils.aoa_to_sheet(usersHeaders.concat(usersData));
+                XLSX.utils.book_append_sheet(wb, usersSheet, "المستخدمين");
+                
+                // 3. ورقة طلبات الشرائح
+                const chipRequestsHeaders = [[
+                    'رقم اللوحة/Plate Number',
+                    'نوع الطلب/Request Type',
+                    'رقم الشريحة الحالي/Current Chip Number',
+                    'ملاحظات الطلب/Request Notes',
+                    'طلب عاجل/Urgent Request',
+                    'حالة الطلب/Request Status',
+                    'مقدم الطلب/Requested By',
+                    'تاريخ الطلب/Request Date',
+                    'معالج بواسطة/Processed By',
+                    'تاريخ المعالجة/Processed At'
+                ]];
+                
+                const chipRequestsData = [];
+                if (chipRequests) {
+                    Object.values(chipRequests).forEach(request => {
+                        chipRequestsData.push([
+                            request.plateNumber || '',
+                            request.requestType || '',
+                            request.currentChipNumber || '',
+                            request.requestNotes || '',
+                            request.urgentRequest ? 'نعم/Yes' : 'لا/No',
+                            request.requestStatus || '',
+                            request.requestedBy || '',
+                            request.requestedAt ? new Date(request.requestedAt).toLocaleString('ar-SA') : '',
+                            request.processedBy || '',
+                            request.processedAt ? new Date(request.processedAt).toLocaleString('ar-SA') : ''
+                        ]);
+                    });
+                }
+                
+                const chipRequestsSheet = XLSX.utils.aoa_to_sheet(chipRequestsHeaders.concat(chipRequestsData));
+                XLSX.utils.book_append_sheet(wb, chipRequestsSheet, "طلبات الشرائح");
+                
+                // تحميل الملف
+                const filename = `جميع_البيانات_${new Date().toISOString().slice(0,10)}.xlsx`;
+                XLSX.writeFile(wb, filename);
+                showMessage('dashboardMessage', 'تم تحميل جميع البيانات بنجاح', 'success');
+                
+            } catch (error) {
+                console.error('Error downloading all data:', error);
+                showMessage('dashboardMessage', 'حدث خطأ أثناء تحميل البيانات', 'error');
+            }
+        }
+
+        // تحميل بيانات المستخدمين
+        async function downloadUsersDataExcel() {
+            try {
+                const usersRef = database.ref('users');
+                const snapshot = await usersRef.once('value');
+                const users = snapshot.val();
+                
+                const headers = [[
+                    'اسم المستخدم/Username',
+                    'كلمة المرور/Password',
+                    'المشروع/Project',
+                    'المنطقة/Area',
+                    'الدور/Role',
+                    'الحالة/Status',
+                    'تاريخ التسجيل/Registration Date',
+                    'آخر دخول/Last Login'
+                ]];
+                
+                const data = [];
+                if (users) {
+                    Object.values(users).forEach(user => {
+                        data.push([
+                            user.username || '',
+                            user.password || '',
+                            user.project || '',
+                            user.area || '',
+                            user.role || '',
+                            user.status || '',
+                            user.createdAt ? new Date(user.createdAt).toLocaleString('ar-SA') : '',
+                            user.lastLogin ? new Date(user.lastLogin).toLocaleString('ar-SA') : ''
+                        ]);
+                    });
+                }
+                
+                const allData = headers.concat(data);
+                const ws = XLSX.utils.aoa_to_sheet(allData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "المستخدمين");
+                
+                // تحميل الملف
+                const filename = `بيانات_المستخدمين_${new Date().toISOString().slice(0,10)}.xlsx`;
+                XLSX.writeFile(wb, filename);
+                showMessage('dashboardMessage', `تم تحميل ${data.length} مستخدم بنجاح`, 'success');
+                
+            } catch (error) {
+                console.error('Error downloading users data:', error);
+                showMessage('dashboardMessage', 'حدث خطأ أثناء تحميل بيانات المستخدمين', 'error');
+            }
+        }
+
+        // تحميل طلبات الشرائح
+        async function downloadChipRequestsExcel() {
+            try {
+                const chipRequestsRef = database.ref('chipRequests');
+                const snapshot = await chipRequestsRef.once('value');
+                const chipRequests = snapshot.val();
+                
+                const headers = [[
+                    'رقم اللوحة/Plate Number',
+                    'نوع الطلب/Request Type',
+                    'رقم الشريحة الحالي/Current Chip Number',
+                    'ملاحظات الطلب/Request Notes',
+                    'طلب عاجل/Urgent Request',
+                    'حالة الطلب/Request Status',
+                    'مقدم الطلب/Requested By',
+                    'تاريخ الطلب/Request Date',
+                    'رقم الطلب/Request ID'
+                ]];
+                
+                const data = [];
+                if (chipRequests) {
+                    Object.values(chipRequests).forEach(request => {
+                        data.push([
+                            request.plateNumber || '',
+                            request.requestType || '',
+                            request.currentChipNumber || '',
+                            request.requestNotes || '',
+                            request.urgentRequest ? 'نعم/Yes' : 'لا/No',
+                            request.requestStatus || '',
+                            request.requestedBy || '',
+                            request.requestedAt ? new Date(request.requestedAt).toLocaleString('ar-SA') : '',
+                            request.requestId || ''
+                        ]);
+                    });
+                }
+                
+                const allData = headers.concat(data);
+                const ws = XLSX.utils.aoa_to_sheet(allData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "طلبات الشرائح");
+                
+                // تحميل الملف
+                const filename = `طلبات_الشرائح_${new Date().toISOString().slice(0,10)}.xlsx`;
+                XLSX.writeFile(wb, filename);
+                showMessage('dashboardMessage', `تم تحميل ${data.length} طلب شريحة بنجاح`, 'success');
+                
+            } catch (error) {
+                console.error('Error downloading chip requests:', error);
+                showMessage('dashboardMessage', 'حدث خطأ أثناء تحميل طلبات الشرائح', 'error');
+            }
+        }
+
+        // تحميل بيانات مستخدم محدد
+        async function downloadUserSpecificData() {
+            const userFilter = document.getElementById('filterAdminUser');
+            if (!userFilter) return;
+            
+            const selectedUser = userFilter.value;
+            if (!selectedUser) {
+                showMessage('dashboardMessage', 'الرجاء اختيار مستخدم أولاً', 'error');
+                return;
+            }
+            
+            try {
+                // جلب بيانات المركبات لهذا المستخدم
+                const vehiclesRef = database.ref('vehicles');
+                const snapshot = await vehiclesRef.orderByChild('createdBy').equalTo(selectedUser).once('value');
+                const vehicles = snapshot.val();
+                
+                const headers = [[
+                    'رقم اللوحة/Plate Number',
+                    'المنطقة/Area',
+                    'المشروع السابق/Previous Project',
+                    'المشروع الحالي/Current Project',
+                    'حالة المركبة/Vehicle Status',
+                    'تاريخ الإنشاء/Created At',
+                    'آخر تحديث/Last Update',
+                    'عدد التحديثات/Update Count'
+                ]];
+                
+                const data = [];
+                if (vehicles) {
+                    Object.values(vehicles).forEach(vehicle => {
+                        const updateHistory = vehicle.updateHistory || [];
+                        data.push([
+                            vehicle.plateNumber || '',
+                            vehicle.area || '',
+                            vehicle.previousProject || '',
+                            vehicle.currentProject || '',
+                            vehicle.vehicleStatus === 'working' ? 'تعمل/Working' : 'متوقفة/Stopped',
+                            vehicle.createdAt ? new Date(vehicle.createdAt).toLocaleString('ar-SA') : '',
+                            vehicle.lastUpdatedAt ? new Date(vehicle.lastUpdatedAt).toLocaleString('ar-SA') : '',
+                            updateHistory.length
+                        ]);
+                    });
+                }
+                
+                if (data.length === 0) {
+                    showMessage('dashboardMessage', 'لا توجد بيانات لهذا المستخدم', 'info');
+                    return;
+                }
+                
+                const allData = headers.concat(data);
+                const ws = XLSX.utils.aoa_to_sheet(allData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, `بيانات_${selectedUser}`);
+                
+                // تحميل الملف
+                const filename = `بيانات_${selectedUser}_${new Date().toISOString().slice(0,10)}.xlsx`;
+                XLSX.writeFile(wb, filename);
+                showMessage('dashboardMessage', `تم تحميل ${data.length} مركبة للمستخدم ${selectedUser}`, 'success');
+                
+            } catch (error) {
+                console.error('Error downloading user data:', error);
+                showMessage('dashboardMessage', 'حدث خطأ أثناء تحميل بيانات المستخدم', 'error');
+            }
+        }
+
+        // تحميل البيانات المصفاة
+        async function downloadFilteredVehicleData() {
+            try {
+                const userFilter = document.getElementById('filterUserVehicles');
+                const dateFilter = document.getElementById('filterDate');
+                
+                const selectedUser = userFilter ? userFilter.value : '';
+                const selectedDate = dateFilter ? dateFilter.value : '';
+                
+                // جلب جميع البيانات
+                const vehiclesRef = database.ref('vehicles');
+                const snapshot = await vehiclesRef.once('value');
+                const vehicles = snapshot.val();
+                
+                if (!vehicles) {
+                    showMessage('dashboardMessage', 'لا توجد بيانات مركبات', 'info');
+                    return;
+                }
+                
+                // تصفية البيانات
+                const filteredData = [];
+                Object.values(vehicles).forEach(vehicle => {
+                    // تطبيق الفلاتر
+                    if (selectedUser && vehicle.createdBy !== selectedUser) return;
+                    
+                    if (selectedDate) {
+                        const vehicleDate = vehicle.createdAt ? 
+                            new Date(vehicle.createdAt).toISOString().slice(0, 10) : '';
+                        if (vehicleDate !== selectedDate) return;
+                    }
+                    
+                    filteredData.push([
+                        vehicle.plateNumber || '',
+                        vehicle.area || '',
+                        vehicle.previousProject || '',
+                        vehicle.currentProject || '',
+                        vehicle.vehicleStatus === 'working' ? 'تعمل/Working' : 'متوقفة/Stopped',
+                        vehicle.createdBy || '',
+                        vehicle.createdAt ? new Date(vehicle.createdAt).toLocaleString('ar-SA') : '',
+                        vehicle.lastUpdatedAt ? new Date(vehicle.lastUpdatedAt).toLocaleString('ar-SA') : ''
+                    ]);
+                });
+                
+                if (filteredData.length === 0) {
+                    showMessage('dashboardMessage', 'لا توجد بيانات مطابقة للفلاتر', 'info');
+                    return;
+                }
+                
+                const headers = [[
+                    'رقم اللوحة/Plate Number',
+                    'المنطقة/Area',
+                    'المشروع السابق/Previous Project',
+                    'المشروع الحالي/Current Project',
+                    'حالة المركبة/Vehicle Status',
+                    'أنشئ بواسطة/Created By',
+                    'تاريخ الإنشاء/Created At',
+                    'آخر تحديث/Last Update'
+                ]];
+                
+                const allData = headers.concat(filteredData);
+                const ws = XLSX.utils.aoa_to_sheet(allData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "المركبات المصفاة");
+                
+                // تحميل الملف
+                const filename = `مركبات_مصفاة_${new Date().toISOString().slice(0,10)}.xlsx`;
+                XLSX.writeFile(wb, filename);
+                showMessage('dashboardMessage', `تم تحميل ${filteredData.length} مركبة بنجاح`, 'success');
+                
+            } catch (error) {
+                console.error('Error downloading filtered data:', error);
+                showMessage('dashboardMessage', 'حدث خطأ أثناء تحميل البيانات المصفاة', 'error');
             }
         }
 
