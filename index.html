@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+  <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -539,14 +540,6 @@
 
         .project-item:last-child {
             border-bottom: none;
-        }
-
-        .project-area {
-            font-size: 0.85rem;
-            color: #666;
-            background: #eee;
-            padding: 3px 8px;
-            border-radius: 12px;
         }
 
         /* Custom Option Styles */
@@ -1117,7 +1110,8 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" data-i18n="plateNumber">رقم اللوحة</label>
-                        <input type="text" id="plateNumber" class="form-input" placeholder="مثال: أ ب ج 1234" data-i18n-ph="plateExample">
+                        <input type="text" id="plateNumber" class="form-input" placeholder="مثال: ABC 1234" data-i18n-ph="plateExample" maxlength="10" oninput="validatePlateNumberInput(this)">
+                        <div id="plateWarning" style="color: #d32f2f; font-size: 0.85rem; margin-top: 5px; display: none;"></div>
                     </div>
                     <div class="form-group">
                         <label class="form-label" data-i18n="area">المنطقة</label>
@@ -1160,10 +1154,6 @@
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" data-i18n="basicFuelQuota">حصة الوقود الأساسية (ريال)</label>
-                        <input type="number" id="fuelQuota" class="form-input" placeholder="مثال: 500" data-i18n-ph="fuelExample" min="1">
-                    </div>
-                    <div class="form-group">
                         <label class="form-label" data-i18n="additionalInfo">معلومات إضافية (اختياري)</label>
                         <input type="text" id="additionalInfo" class="form-input" placeholder="ملاحظات إضافية عن المركبة" data-i18n-ph="additionalNotes">
                     </div>
@@ -1187,7 +1177,7 @@
                 <p data-i18n="clickToUpload">أو انقر لاختيار الملف من الجهاز</p>
                 <p style="color: #666; font-size: 0.9rem;" data-i18n="excelFormat">
                     يجب أن يحتوي الملف على الأعمدة التالية بالترتيب:<br>
-                    رقم اللوحة، المشروع السابق، المشروع الحالي، المنطقة، حصة الوقود الأساسية (ريال)
+                    رقم اللوحة، المشروع السابق، المشروع الحالي، المنطقة
                 </p>
                 <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display: none;" onchange="handleExcelFileSelect(event)">
             </div>
@@ -1215,7 +1205,6 @@
                                 <th data-i18n="previousProject">المشروع السابق</th>
                                 <th data-i18n="currentProject">المشروع الحالي</th>
                                 <th data-i18n="area">المنطقة</th>
-                                <th data-i18n="basicFuelQuota">حصة الوقود (ريال)</th>
                                 <th data-i18n="action">الإجراء</th>
                             </tr>
                         </thead>
@@ -1260,7 +1249,6 @@
                             <th data-i18n="area">المنطقة</th>
                             <th data-i18n="previousProject">المشروع السابق</th>
                             <th data-i18n="currentProject">المشروع الحالي</th>
-                            <th data-i18n="basicFuelQuota">حصة الوقود (ريال)</th>
                             <th data-i18n="lastUpdate">آخر تحديث</th>
                             <th data-i18n="updatedBy">محدث بواسطة</th>
                             <th data-i18n="actions">الإجراءات</th>
@@ -1356,7 +1344,6 @@
                             <th data-i18n="area">المنطقة</th>
                             <th data-i18n="previousProject">المشروع السابق</th>
                             <th data-i18n="currentProject">المشروع الحالي</th>
-                            <th data-i18n="basicFuelQuota">حصة الوقود</th>
                             <th data-i18n="lastUpdate">آخر تحديث</th>
                             <th data-i18n="updateHistory">سجل التحديثات</th>
                         </tr>
@@ -1436,7 +1423,8 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label" data-i18n="plateNumber">رقم اللوحة</label>
-                            <input type="text" id="editPlate" class="form-input" required>
+                            <input type="text" id="editPlate" class="form-input" required oninput="validateEditPlateNumberInput(this)">
+                            <div id="editPlateWarning" style="color: #d32f2f; font-size: 0.85rem; margin-top: 5px; display: none;"></div>
                         </div>
                         <div class="form-group">
                             <label class="form-label" data-i18n="area">المنطقة</label>
@@ -1472,10 +1460,6 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="basicFuelQuota">حصة الوقود الأساسية (ريال)</label>
-                            <input type="number" id="editFuel" class="form-input" required min="1">
-                        </div>
                         <div class="form-group">
                             <label class="form-label" data-i18n="additionalInfo">معلومات إضافية</label>
                             <input type="text" id="editAdditionalInfo" class="form-input" placeholder="ملاحظات إضافية" data-i18n-ph="additionalNotes">
@@ -1556,14 +1540,13 @@
                 plateNumber: "رقم اللوحة",
                 previousProject: "المشروع السابق",
                 currentProject: "المشروع الحالي",
-                basicFuelQuota: "حصة الوقود الأساسية",
                 additionalInfo: "معلومات إضافية",
                 saveVehicle: "حفظ بيانات المركبة",
                 
                 // Excel Upload
                 dropFile: "اسحب وأفلت ملف إكسل هنا",
                 clickToUpload: "أو انقر لاختيار الملف من الجهاز",
-                excelFormat: "يجب أن يحتوي الملف على الأعمدة التالية بالترتيب: رقم اللوحة، المشروع السابق، المشروع الحالي، المنطقة، حصة الوقود الأساسية (ريال)",
+                excelFormat: "يجب أن يحتوي الملف على الأعمدة التالية بالترتيب: رقم اللوحة، المشروع السابق، المشروع الحالي، المنطقة",
                 previewData: "معاينة البيانات",
                 uploadData: "رفع البيانات إلى النظام",
                 updateData: "تحديث البيانات الموجودة",
@@ -1637,6 +1620,8 @@
                 deactivateUser: "تعطيل المستخدم",
                 activateUser: "تفعيل المستخدم",
                 lastUpdateTime: "وقت التحديث",
+                plateArabicWarning: "ممنوع استخدام الحروف العربية في رقم اللوحة",
+                plateLowercaseWarning: "يجب أن تكون الحروف الإنجليزية كبتل (CAPITAL) فقط",
                 
                 // General
                 add: "إضافة",
@@ -1647,18 +1632,13 @@
                 searchProject: "ابحث عن المشروع...",
                 addCustomProject: "أضف مشروع جديد يدوياً...",
                 addCustomArea: "أضف منطقة جديدة يدوياً...",
-                plateExample: "مثال: أ ب ج 1234",
+                plateExample: "مثال: ABC 1234",
                 searchPreviousProject: "ابحث عن المشروع السابق...",
                 searchCurrentProject: "ابحث عن المشروع الحالي...",
-                fuelExample: "مثال: 500",
                 additionalNotes: "ملاحظات إضافية عن المركبة",
                 leaveEmpty: "اتركه فارغاً إذا لم ترد التغيير",
                 enterCurrentPassword: "أدخل كلمة المرور الحالية للتأكيد",
-                searchPlateNumber: "ابحث برقم اللوحة...",
-                
-                // Fuel unit
-                fuelUnit: "ريال",
-                fuelUnitFull: "ريال"
+                searchPlateNumber: "ابحث برقم اللوحة..."
             },
             en: {
                 // Authentication
@@ -1695,14 +1675,13 @@
                 plateNumber: "Plate Number",
                 previousProject: "Previous Project",
                 currentProject: "Current Project",
-                basicFuelQuota: "Basic Fuel Quota",
                 additionalInfo: "Additional Information",
                 saveVehicle: "Save Vehicle Data",
                 
                 // Excel Upload
                 dropFile: "Drag & Drop Excel File Here",
                 clickToUpload: "Or click to select file from device",
-                excelFormat: "File must contain these columns in order: Plate Number, Previous Project, Current Project, Area, Basic Fuel Quota (SAR)",
+                excelFormat: "File must contain these columns in order: Plate Number, Previous Project, Current Project, Area",
                 previewData: "Preview Data",
                 uploadData: "Upload Data to System",
                 updateData: "Update Existing Data",
@@ -1776,6 +1755,8 @@
                 deactivateUser: "Deactivate User",
                 activateUser: "Activate User",
                 lastUpdateTime: "Update Time",
+                plateArabicWarning: "Arabic letters are not allowed in plate number",
+                plateLowercaseWarning: "English letters must be CAPITAL only",
                 
                 // General
                 add: "Add",
@@ -1789,129 +1770,144 @@
                 plateExample: "Example: ABC 1234",
                 searchPreviousProject: "Search previous project...",
                 searchCurrentProject: "Search current project...",
-                fuelExample: "Example: 500",
                 additionalNotes: "Additional notes about the vehicle",
                 leaveEmpty: "Leave empty if you don't want to change",
                 enterCurrentPassword: "Enter current password for confirmation",
-                searchPlateNumber: "Search by plate number...",
-                
-                // Fuel unit
-                fuelUnit: "SAR",
-                fuelUnitFull: "Saudi Riyals"
+                searchPlateNumber: "Search by plate number..."
             }
         };
 
-        // السعودية المناطق - باللغتين
+        // المناطق باللغتين - بنفس الصيغة: العربية/English
         let saudiAreas = {
             ar: [
-                "الرياض", "مكة المكرمة", "المدينة المنورة", "الدمام", "الخبر",
-                "جدة", "الطائف", "تبوك", "حائل", "بريدة",
-                "سكاكا", "أبها", "جازان", "نجران", "الباحة",
-                "عرعر", "القريات", "الجبيل", "ينبع", "رابغ",
-                "الخرج", "الأحساء"
+                "الرياض/Riyadh",
+                "مكة المكرمة/Makkah",
+                "المدينة المنورة/Madinah",
+                "الدمام/Dammam",
+                "الخبر/Khobar",
+                "جدة/Jeddah",
+                "الطائف/Taif",
+                "تبوك/Tabuk",
+                "حائل/Hail",
+                "بريدة/Buraidah",
+                "سكاكا/Sakaka",
+                "أبها/Abha",
+                "جازان/Jazan",
+                "نجران/Najran",
+                "الباحة/Al Baha",
+                "عرعر/Arar",
+                "القريات/Al Qurayyat",
+                "الجبيل/Al Jubail",
+                "ينبع/Yanbu",
+                "رابغ/Rabigh",
+                "الخرج/Al Kharj",
+                "الأحساء/Al Ahsa"
             ],
             en: [
-                "Riyadh", "Makkah", "Madinah", "Dammam", "Khobar",
-                "Jeddah", "Taif", "Tabuk", "Hail", "Buraidah",
-                "Sakaka", "Abha", "Jazan", "Najran", "Al Baha",
-                "Arar", "Al Qurayyat", "Al Jubail", "Yanbu", "Rabigh",
-                "Al Kharj", "Al Ahsa"
+                "الرياض/Riyadh",
+                "مكة المكرمة/Makkah",
+                "المدينة المنورة/Madinah",
+                "الدمام/Dammam",
+                "الخبر/Khobar",
+                "جدة/Jeddah",
+                "الطائف/Taif",
+                "تبوك/Tabuk",
+                "حائل/Hail",
+                "بريدة/Buraidah",
+                "سكاكا/Sakaka",
+                "أبها/Abha",
+                "جازان/Jazan",
+                "نجران/Najran",
+                "الباحة/Al Baha",
+                "عرعر/Arar",
+                "القريات/Al Qurayyat",
+                "الجبيل/Al Jubail",
+                "ينبع/Yanbu",
+                "رابغ/Rabigh",
+                "الخرج/Al Kharj",
+                "الأحساء/Al Ahsa"
             ]
         };
 
-        // قائمة المشاريع المنظمة بشكل صحيح - باللغتين
+        // قائمة المشاريع باللغتين - بنفس الصيغة: العربية/English
         let projectsList = {
             ar: [
-                // المشاريع مع المناطق المحددة
-                { name: "كيمارت", area: "الخرج" },
-                { name: "المراعي", area: "الرياض" },
-                { name: "ارامكس", area: "الرياض" },
-                { name: "كيمارت دبابات", area: "الدمام" },
-                { name: "نينجا دبابات", area: "الدمام" },
-                { name: "كيمارت", area: "الدمام" },
-                { name: "سلاسه", area: "الرياض" },
-                { name: "الببسي", area: "الرياض" },
-                { name: "6 ستريت", area: "الرياض" },
-                { name: "نون مينيتس", area: "الرياض" },
-                { name: "فيديكس", area: "الرياض" },
-                { name: "ملهم", area: "الرياض" },
-                { name: "ناقل سبل", area: "الرياض" },
-                { name: "ناقل جاف", area: "الرياض" },
-                { name: "كيمارت", area: "الرياض" },
-                { name: "فرست كراي", area: "الرياض" },
-                { name: "لاند مارك", area: "الرياض" },
-                { name: "نون 3 بي ال", area: "الرياض" },
-                { name: "ترانسكورب", area: "الرياض" },
-                { name: "فيدكس", area: "الرياض" },
-                { name: "اتا", area: "حائل" },
-                { name: "امازون", area: "مكة" },
-                { name: "بندا", area: "مكة" },
-                { name: "مستودعات الزهراني", area: "الرياض" },
-                { name: "كي مارت", area: "تبوك" },
-                { name: "ناقل", area: "الرياض" },
-                { name: "شيبا", area: "جازان" },
-                { name: "دينا", area: "جازان" },
-                { name: "فلو 6 استريت", area: "الرياض" },
-                { name: "فيرستكراى", area: "الرياض" },
-                { name: "كيتا", area: "الرياض" },
-                { name: "نابكو", area: "الرياض" },
-                { name: "لاندمارك", area: "الرياض" },
-                { name: "نون-3 بي ال", area: "الرياض" },
-                { name: "اى مكان", area: "الرياض" },
-                { name: "سلاسة", area: "الرياض" },
-                { name: "الدانة", area: "الرياض" },
-                
-                // المشاريع العامة (بدون منطقة محددة)
-                { name: "سلاسه", area: "غير محدد" },
-                { name: "كيتا", area: "غير محدد" },
-                { name: "نينجا", area: "غير محدد" },
-                { name: "دبابات", area: "غير محدد" }
+                "كيمارت/Kimart",
+                "المراعي/Almarai",
+                "ارامكس/Aramex",
+                "كيمارت دبابات/Kimart Dabat",
+                "نينجا دبابات/Ninja Dabat",
+                "كيمارت/Kimart",
+                "سلاسه/Salasah",
+                "الببسي/Pepsi",
+                "6 ستريت/6 Street",
+                "نون/Noon",
+                "فيديكس/FedEx",
+                "ملهم/Mulham",
+                "ناقل سبل/Naqel Sabil",
+                "ناقل جاف/Naqel Jaf",
+                "فرست كراي/First Cry",
+                "لاند مارك/Landmark",
+                "نون 3 بي ال/Noon 3PL",
+                "ترانسكورب/Transcorp",
+                "فيدكس/FedEx",
+                "اتا/ATA",
+                "امازون/Amazon",
+                "بندا/Panda",
+                "مستودعات الزهراني/Alzahrani Warehouses",
+                "كي مارت/K Mart",
+                "ناقل/Naqel",
+                "شيبا/Sheba",
+                "دينا/Dina",
+                "فلو 6 استريت/Flow 6 Street",
+                "فيرستكراى/FirstCry",
+                "كيتا/Kita",
+                "نابكو/Nabco",
+                "لاندمارك/Landmark",
+                "نون-3 بي ال/Noon-3PL",
+                "اى مكان/Anywhere",
+                "سلاسة/Salasah",
+                "الدانة/Aldana",
+                "لا يوجد/No Vehicle"
             ],
             en: [
-                // Projects with specific areas
-                { name: "Kimart", area: "Al Kharj" },
-                { name: "Almarai", area: "Riyadh" },
-                { name: "Aramex", area: "Riyadh" },
-                { name: "Kimart Dabat", area: "Dammam" },
-                { name: "Ninja Dabat", area: "Dammam" },
-                { name: "Kimart", area: "Dammam" },
-                { name: "Salasah", area: "Riyadh" },
-                { name: "Pepsi", area: "Riyadh" },
-                { name: "6 Street", area: "Riyadh" },
-                { name: "Noon Minutes", area: "Riyadh" },
-                { name: "FedEx", area: "Riyadh" },
-                { name: "Mulham", area: "Riyadh" },
-                { name: "Naqel Sabil", area: "Riyadh" },
-                { name: "Naqel Jaf", area: "Riyadh" },
-                { name: "Kimart", area: "Riyadh" },
-                { name: "First Cry", area: "Riyadh" },
-                { name: "Landmark", area: "Riyadh" },
-                { name: "Noon 3PL", area: "Riyadh" },
-                { name: "Transcorp", area: "Riyadh" },
-                { name: "FedEx", area: "Riyadh" },
-                { name: "ATA", area: "Hail" },
-                { name: "Amazon", area: "Makkah" },
-                { name: "Panda", area: "Makkah" },
-                { name: "Alzahrani Warehouses", area: "Riyadh" },
-                { name: "K Mart", area: "Tabuk" },
-                { name: "Naqel", area: "Riyadh" },
-                { name: "Sheba", area: "Jazan" },
-                { name: "Dina", area: "Jazan" },
-                { name: "Flow 6 Street", area: "Riyadh" },
-                { name: "FirstCry", area: "Riyadh" },
-                { name: "Kita", area: "Riyadh" },
-                { name: "Nabco", area: "Riyadh" },
-                { name: "Landmark", area: "Riyadh" },
-                { name: "Noon-3PL", area: "Riyadh" },
-                { name: "Anywhere", area: "Riyadh" },
-                { name: "Salasah", area: "Riyadh" },
-                { name: "Aldana", area: "Riyadh" },
-                
-                // General projects (no specific area)
-                { name: "Salasah", area: "Not specified" },
-                { name: "Kita", area: "Not specified" },
-                { name: "Ninja", area: "Not specified" },
-                { name: "Dabat", area: "Not specified" }
+                "كيمارت/Kimart",
+                "المراعي/Almarai",
+                "ارامكس/Aramex",
+                "كيمارت دبابات/Kimart Dabat",
+                "نينجا دبابات/Ninja Dabat",
+                "كيمارت/Kimart",
+                "سلاسه/Salasah",
+                "الببسي/Pepsi",
+                "6 ستريت/6 Street",
+                "نون/Noon",
+                "فيديكس/FedEx",
+                "ملهم/Mulham",
+                "ناقل سبل/Naqel Sabil",
+                "ناقل جاف/Naqel Jaf",
+                "فرست كراي/First Cry",
+                "لاند مارك/Landmark",
+                "نون 3 بي ال/Noon 3PL",
+                "ترانسكورب/Transcorp",
+                "فيدكس/FedEx",
+                "اتا/ATA",
+                "امازون/Amazon",
+                "بندا/Panda",
+                "مستودعات الزهراني/Alzahrani Warehouses",
+                "كي مارت/K Mart",
+                "ناقل/Naqel",
+                "شيبا/Sheba",
+                "دينا/Dina",
+                "فلو 6 استريت/Flow 6 Street",
+                "فيرستكراى/FirstCry",
+                "كيتا/Kita",
+                "نابكو/Nabco",
+                "لاندمارك/Landmark",
+                "نون-3 بي ال/Noon-3PL",
+                "اى مكان/Anywhere",
+                "سلاسة/Salasah",
+                "الدانة/Aldana",
+                "لا يوجد/No Vehicle"
             ]
         };
 
@@ -1956,22 +1952,26 @@
             const areaName = customAreaInput.value.trim();
             
             if (!areaName) {
-                showMessage('authMessage', translate('enterAreaName'), 'error');
+                showMessage('authMessage', 'الرجاء إدخال اسم المنطقة', 'error');
+                return;
+            }
+            
+            // التحقق من صيغة المنطقة
+            if (!areaName.includes('/')) {
+                showMessage('authMessage', 'يجب إدخال المنطقة بالصيغة: عربي/إنجليزي', 'error');
                 return;
             }
             
             if (saudiAreas[currentLanguage].includes(areaName)) {
-                showMessage('authMessage', translate('areaExists'), 'info');
+                showMessage('authMessage', 'هذه المنطقة موجودة بالفعل', 'info');
                 return;
             }
             
             saudiAreas[currentLanguage].push(areaName);
             
-            if (currentLanguage === 'ar') {
-                saudiAreas.en.push(areaName);
-            } else {
-                saudiAreas.ar.push(areaName);
-            }
+            // إضافة للغة الأخرى أيضاً
+            const otherLang = currentLanguage === 'ar' ? 'en' : 'ar';
+            saudiAreas[otherLang].push(areaName);
             
             loadAreas();
             
@@ -1981,7 +1981,7 @@
             
             customAreaInput.value = '';
             
-            showMessage('authMessage', `${translate('areaAdded')} "${areaName}"`, 'success');
+            showMessage('authMessage', `تمت إضافة المنطقة "${areaName}"`, 'success');
         }
 
         // إضافة مشروع مخصص
@@ -1990,36 +1990,34 @@
             const projectName = customProjectInput.value.trim();
             
             if (!projectName) {
-                showMessage('authMessage', translate('enterProjectName'), 'error');
+                showMessage('authMessage', 'الرجاء إدخال اسم المشروع', 'error');
                 return;
             }
             
-            const exists = projectsList[currentLanguage].some(p => p.name === projectName);
+            // التحقق من صيغة المشروع
+            if (!projectName.includes('/')) {
+                showMessage('authMessage', 'يجب إدخال المشروع بالصيغة: عربي/إنجليزي', 'error');
+                return;
+            }
+            
+            const exists = projectsList[currentLanguage].some(p => p === projectName);
             if (exists) {
-                showMessage('authMessage', translate('projectExists'), 'info');
+                showMessage('authMessage', 'هذا المشروع موجود بالفعل', 'info');
                 return;
             }
             
-            const selectedArea = document.getElementById('regArea').value || 
-                                (currentLanguage === 'ar' ? 'الرياض' : 'Riyadh');
+            projectsList[currentLanguage].push(projectName);
             
-            projectsList[currentLanguage].push({ 
-                name: projectName, 
-                area: selectedArea 
-            });
-            
+            // إضافة للغة الأخرى أيضاً
             const otherLang = currentLanguage === 'ar' ? 'en' : 'ar';
-            projectsList[otherLang].push({ 
-                name: projectName, 
-                area: selectedArea 
-            });
+            projectsList[otherLang].push(projectName);
             
             loadProjectsLists();
             
             const projectsListContainer = document.getElementById('projectsList');
             if (projectsListContainer) {
                 projectsListContainer.querySelectorAll('.project-item').forEach(item => {
-                    if (item.querySelector('span').textContent === projectName) {
+                    if (item.textContent.includes(projectName)) {
                         item.classList.add('selected');
                     }
                 });
@@ -2029,7 +2027,7 @@
             
             customProjectInput.value = '';
             
-            showMessage('authMessage', `${translate('projectAdded')} "${projectName}"`, 'success');
+            showMessage('authMessage', `تمت إضافة المشروع "${projectName}"`, 'success');
         }
 
         // تحميل قوائم المشاريع
@@ -2058,39 +2056,29 @@
             
             if (searchTerm) {
                 filteredProjects = projectsList[lang].filter(project => 
-                    project.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                    project.area.toLowerCase().includes(searchTerm.toLowerCase())
+                    project.toLowerCase().includes(searchTerm.toLowerCase())
                 );
             }
             
-            // إضافة خيار "لا يوجد" في الأعلى دائماً
-            const noVehicleOption = lang === 'ar' ? "لا يوجد" : "No Vehicle";
-            const hasNoVehicleOption = filteredProjects.some(p => p.name === noVehicleOption);
-            
-            if (!hasNoVehicleOption) {
-                filteredProjects.unshift({ name: noVehicleOption, area: lang === 'ar' ? "غير محدد" : "Not specified" });
-            }
-            
-            // فرز المشاريع: "لا يوجد" أولاً، ثم المشاريع الأخرى
+            // فرز المشاريع
             filteredProjects.sort((a, b) => {
-                if (a.name === noVehicleOption) return -1;
-                if (b.name === noVehicleOption) return 1;
-                return a.name.localeCompare(b.name);
+                const aName = a.toLowerCase();
+                const bName = b.toLowerCase();
+                return aName.localeCompare(bName);
             });
             
             filteredProjects.forEach(project => {
                 const item = document.createElement('div');
                 item.className = 'project-item';
-                if (project.name === noVehicleOption) {
+                
+                // تمييز مشروع "لا يوجد"
+                if (project.includes('لا يوجد') || project.includes('No Vehicle')) {
                     item.style.background = '#f8f9fa';
                     item.style.fontWeight = 'bold';
                     item.style.color = '#666';
                 }
                 
-                item.innerHTML = `
-                    <span>${project.name}</span>
-                    <span class="project-area">${project.area}</span>
-                `;
+                item.textContent = project;
                 
                 item.onclick = () => {
                     container.querySelectorAll('.project-item').forEach(el => {
@@ -2100,17 +2088,17 @@
                     item.classList.add('selected');
                     
                     if (listType === 'projectsList') {
-                        selectedProject = project.name;
+                        selectedProject = project;
                     } else if (listType === 'prevProjectsList') {
-                        document.getElementById('previousProject').value = project.name;
+                        document.getElementById('previousProject').value = project;
                     } else if (listType === 'currProjectsList') {
-                        document.getElementById('currentProject').value = project.name;
+                        document.getElementById('currentProject').value = project;
                     } else if (listType === 'profileProjectsList') {
-                        document.getElementById('profileProject').value = project.name;
+                        document.getElementById('profileProject').value = project;
                     } else if (listType === 'editPrevProjectsList') {
-                        document.getElementById('editPrevProject').value = project.name;
+                        document.getElementById('editPrevProject').value = project;
                     } else if (listType === 'editCurrProjectsList') {
-                        document.getElementById('editCurrProject').value = project.name;
+                        document.getElementById('editCurrProject').value = project;
                     }
                 };
                 
@@ -2120,7 +2108,7 @@
             if (filteredProjects.length === 0) {
                 const noResults = document.createElement('div');
                 noResults.className = 'project-item';
-                noResults.innerHTML = `<span style="color: #666;">${translate('noResults')}</span>`;
+                noResults.innerHTML = `<span style="color: #666;">لا توجد نتائج - يمكنك إضافة مشروع جديد</span>`;
                 container.appendChild(noResults);
             }
         }
@@ -2160,6 +2148,75 @@
             const searchTerm = document.getElementById('editCurrProjectSearch').value;
             const list = document.getElementById('editCurrProjectsList');
             renderProjectsList(list, searchTerm, 'editCurrProjectsList');
+        }
+
+        // التحقق من رقم اللوحة أثناء الكتابة
+        function validatePlateNumberInput(input) {
+            const plateNumber = input.value;
+            const warningDiv = document.getElementById('plateWarning');
+            
+            // التحقق إذا كان هناك أحرف عربية
+            const arabicRegex = /[\u0600-\u06FF]/;
+            if (arabicRegex.test(plateNumber)) {
+                warningDiv.textContent = translate('plateArabicWarning');
+                warningDiv.style.display = 'block';
+                return false;
+            }
+            
+            // التحقق إذا كانت الحروف الإنجليزية صغيرة
+            const lowercaseEnglish = /[a-z]/;
+            if (lowercaseEnglish.test(plateNumber)) {
+                warningDiv.textContent = translate('plateLowercaseWarning');
+                warningDiv.style.display = 'block';
+                return false;
+            }
+            
+            warningDiv.style.display = 'none';
+            return true;
+        }
+
+        // التحقق من رقم اللوحة في نموذج التعديل
+        function validateEditPlateNumberInput(input) {
+            const plateNumber = input.value;
+            const warningDiv = document.getElementById('editPlateWarning');
+            
+            // التحقق إذا كان هناك أحرف عربية
+            const arabicRegex = /[\u0600-\u06FF]/;
+            if (arabicRegex.test(plateNumber)) {
+                warningDiv.textContent = translate('plateArabicWarning');
+                warningDiv.style.display = 'block';
+                return false;
+            }
+            
+            // التحقق إذا كانت الحروف الإنجليزية صغيرة
+            const lowercaseEnglish = /[a-z]/;
+            if (lowercaseEnglish.test(plateNumber)) {
+                warningDiv.textContent = translate('plateLowercaseWarning');
+                warningDiv.style.display = 'block';
+                return false;
+            }
+            
+            warningDiv.style.display = 'none';
+            return true;
+        }
+
+        // التحقق النهائي من رقم اللوحة قبل الإرسال
+        function validatePlateNumber(plateNumber) {
+            // التحقق إذا كان هناك أحرف عربية
+            const arabicRegex = /[\u0600-\u06FF]/;
+            if (arabicRegex.test(plateNumber)) {
+                showMessage('dashboardMessage', translate('plateArabicWarning'), 'error');
+                return false;
+            }
+            
+            // التحقق إذا كانت الحروف الإنجليزية صغيرة
+            const lowercaseEnglish = /[a-z]/;
+            if (lowercaseEnglish.test(plateNumber)) {
+                showMessage('dashboardMessage', translate('plateLowercaseWarning'), 'error');
+                return false;
+            }
+            
+            return true;
         }
 
         // تغيير اللغة
@@ -2278,13 +2335,13 @@
                             showDashboard();
                             showMessage('dashboardMessage', translate('loginSuccess'), 'success');
                         } else {
-                            showMessage('authMessage', translate('pendingApproval'), 'error');
+                            showMessage('authMessage', 'الحساب قيد الانتظار للموافقة', 'error');
                         }
                     } else {
-                        showMessage('authMessage', translate('invalidCredentials'), 'error');
+                        showMessage('authMessage', 'اسم المستخدم أو كلمة المرور غير صحيحة', 'error');
                     }
                 } else {
-                    showMessage('authMessage', translate('noUsers'), 'error');
+                    showMessage('authMessage', 'لا يوجد مستخدمون مسجلون', 'error');
                 }
             });
 
@@ -2296,12 +2353,12 @@
                 const areaValue = document.getElementById('regArea').value;
                 
                 if (!projectValue) {
-                    showMessage('authMessage', translate('selectProject'), 'error');
+                    showMessage('authMessage', 'الرجاء اختيار أو إضافة مشروع', 'error');
                     return;
                 }
                 
                 if (!areaValue) {
-                    showMessage('authMessage', translate('selectArea'), 'error');
+                    showMessage('authMessage', 'الرجاء اختيار المنطقة', 'error');
                     return;
                 }
                 
@@ -2336,16 +2393,20 @@
             document.getElementById('vehicleForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
-                const prevProject = document.getElementById('previousProject').value || translate('noVehicle');
-                const currProject = document.getElementById('currentProject').value || translate('noVehicle');
+                const plateNumber = document.getElementById('plateNumber').value;
+                if (!validatePlateNumber(plateNumber)) {
+                    return;
+                }
+                
+                const prevProject = document.getElementById('previousProject').value || 'لا يوجد/No Vehicle';
+                const currProject = document.getElementById('currentProject').value || 'لا يوجد/No Vehicle';
                 
                 const now = new Date();
                 const vehicle = {
-                    plateNumber: document.getElementById('plateNumber').value,
+                    plateNumber: plateNumber,
                     area: document.getElementById('vehicleArea').value,
                     previousProject: prevProject,
                     currentProject: currProject,
-                    basicFuelQuota: document.getElementById('fuelQuota').value,
                     additionalInfo: document.getElementById('additionalInfo').value || '',
                     createdBy: currentUser.username,
                     createdAt: now.toISOString(),
@@ -2390,7 +2451,7 @@
                 const selectedProfileProject = document.getElementById('profileProject').value;
                 
                 if (currentUser.password !== currentPassword && currentUser.username !== 'هوندا' && currentUser.username !== 'Honda') {
-                    showMessage('dashboardMessage', translate('incorrectPassword'), 'error');
+                    showMessage('dashboardMessage', 'كلمة المرور الحالية غير صحيحة', 'error');
                     return;
                 }
                 
@@ -2415,21 +2476,26 @@
             // نموذج التعديل
             document.getElementById('editForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
+                
+                const plateNumber = document.getElementById('editPlate').value;
+                if (!validatePlateNumber(plateNumber)) {
+                    return;
+                }
+                
                 const now = new Date();
                 const vehicleId = document.getElementById('editId').value;
-                const editPrevProject = document.getElementById('editPrevProject').value || translate('noVehicle');
-                const editCurrProject = document.getElementById('editCurrProject').value || translate('noVehicle');
+                const editPrevProject = document.getElementById('editPrevProject').value || 'لا يوجد/No Vehicle';
+                const editCurrProject = document.getElementById('editCurrProject').value || 'لا يوجد/No Vehicle';
                 
                 const vehicleRef = database.ref('vehicles/' + vehicleId);
                 const snapshot = await vehicleRef.once('value');
                 const currentVehicle = snapshot.val();
                 
                 const updates = {
-                    plateNumber: document.getElementById('editPlate').value,
+                    plateNumber: plateNumber,
                     area: document.getElementById('editArea').value,
                     previousProject: editPrevProject,
                     currentProject: editCurrProject,
-                    basicFuelQuota: document.getElementById('editFuel').value,
                     additionalInfo: document.getElementById('editAdditionalInfo').value || '',
                     lastUpdatedBy: currentUser.username,
                     lastUpdatedAt: now.toISOString()
@@ -2529,27 +2595,24 @@
             // بيانات تجريبية للعرض
             excelData = [
                 {
-                    plateNumber: currentLanguage === 'ar' ? 'أ ب ج 1234' : 'ABC 1234',
-                    previousProject: currentLanguage === 'ar' ? 'ارامكس' : 'Aramex',
-                    currentProject: currentLanguage === 'ar' ? 'لا يوجد' : 'No Vehicle',
-                    area: currentLanguage === 'ar' ? 'الرياض' : 'Riyadh',
-                    basicFuelQuota: '500',
+                    plateNumber: 'ABC 1234',
+                    previousProject: 'ارامكس/Aramex',
+                    currentProject: 'لا يوجد/No Vehicle',
+                    area: 'الرياض/Riyadh',
                     action: translate('newEntry')
                 },
                 {
-                    plateNumber: currentLanguage === 'ar' ? 'د هـ و 5678' : 'DEF 5678',
-                    previousProject: currentLanguage === 'ar' ? 'لا يوجد' : 'No Vehicle',
-                    currentProject: currentLanguage === 'ar' ? 'الببسي' : 'Pepsi',
-                    area: currentLanguage === 'ar' ? 'الرياض' : 'Riyadh',
-                    basicFuelQuota: '750',
+                    plateNumber: 'DEF 5678',
+                    previousProject: 'لا يوجد/No Vehicle',
+                    currentProject: 'الببسي/Pepsi',
+                    area: 'الرياض/Riyadh',
                     action: translate('updateExisting')
                 },
                 {
-                    plateNumber: currentLanguage === 'ar' ? 'ز ح ط 9012' : 'GHI 9012',
-                    previousProject: currentLanguage === 'ar' ? 'لا يوجد' : 'No Vehicle',
-                    currentProject: currentLanguage === 'ar' ? 'لا يوجد' : 'No Vehicle',
-                    area: currentLanguage === 'ar' ? 'الدمام' : 'Dammam',
-                    basicFuelQuota: '600',
+                    plateNumber: 'GHI 9012',
+                    previousProject: 'لا يوجد/No Vehicle',
+                    currentProject: 'لا يوجد/No Vehicle',
+                    area: 'الدمام/Dammam',
                     action: translate('newEntry')
                 }
             ];
@@ -2570,7 +2633,6 @@
                     <td>${row.previousProject}</td>
                     <td>${row.currentProject}</td>
                     <td>${row.area}</td>
-                    <td>${row.basicFuelQuota} ${translate('fuelUnit')}</td>
                     <td><span class="status-badge ${row.action === translate('newEntry') ? 'status-active' : 'status-warning'}">${row.action}</span></td>
                 `;
                 previewBody.appendChild(tr);
@@ -2584,6 +2646,11 @@
             const now = new Date();
             
             for (const vehicle of excelData) {
+                // التحقق من رقم اللوحة
+                if (!validatePlateNumber(vehicle.plateNumber)) {
+                    continue;
+                }
+                
                 const vehicleData = {
                     ...vehicle,
                     createdBy: currentUser.username,
@@ -2617,6 +2684,11 @@
             const now = new Date();
             
             for (const vehicle of excelData) {
+                // التحقق من رقم اللوحة
+                if (!validatePlateNumber(vehicle.plateNumber)) {
+                    continue;
+                }
+                
                 const vehiclesRef = database.ref('vehicles');
                 const snapshot = await vehiclesRef.orderByChild('plateNumber').equalTo(vehicle.plateNumber).once('value');
                 const existingVehicles = snapshot.val();
@@ -2630,7 +2702,6 @@
                         previousProject: vehicle.previousProject,
                         currentProject: vehicle.currentProject,
                         area: vehicle.area,
-                        basicFuelQuota: vehicle.basicFuelQuota,
                         lastUpdatedBy: currentUser.username,
                         lastUpdatedAt: now.toISOString()
                     };
@@ -2743,7 +2814,7 @@
                     const profileList = document.getElementById('profileProjectsList');
                     if (profileList) {
                         profileList.querySelectorAll('.project-item').forEach(item => {
-                            if (item.querySelector('span').textContent === currentUser.project) {
+                            if (item.textContent === currentUser.project) {
                                 item.classList.add('selected');
                             }
                         });
@@ -2766,7 +2837,7 @@
             const recordsBody = document.getElementById('recordsBody');
             if (!recordsBody) return;
             
-            recordsBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;">جارٍ تحميل السجلات...</td></tr>';
+            recordsBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">جارٍ تحميل السجلات...</td></tr>';
             
             const vehiclesRef = database.ref('vehicles');
             const snapshot = await vehiclesRef.once('value');
@@ -2787,7 +2858,6 @@
                         <td>${vehicle.area}</td>
                         <td>${vehicle.previousProject}</td>
                         <td>${vehicle.currentProject}</td>
-                        <td>${vehicle.basicFuelQuota} ${translate('fuelUnit')}</td>
                         <td><span class="timestamp-cell">${lastUpdate}</span></td>
                         <td>${vehicle.lastUpdatedBy || vehicle.createdBy}</td>
                         <td>
@@ -2806,7 +2876,7 @@
                     recordsBody.appendChild(row);
                 });
             } else {
-                recordsBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 40px;">${translate('noRecords')}</td></tr>`;
+                recordsBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">لا توجد سجلات مركبات</td></tr>`;
             }
             
             updateFilterDropdowns(vehicles);
@@ -2861,7 +2931,7 @@
             
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
-                if (cells.length < 7) return;
+                if (cells.length < 6) return;
                 
                 const area = cells[1].textContent;
                 const project = cells[3].textContent;
@@ -2882,7 +2952,6 @@
             
             document.getElementById('editId').value = vehicleId;
             document.getElementById('editPlate').value = vehicle.plateNumber || '';
-            document.getElementById('editFuel').value = vehicle.basicFuelQuota || '';
             document.getElementById('editAdditionalInfo').value = vehicle.additionalInfo || '';
             
             const areaSelect = document.getElementById('editArea');
@@ -2904,7 +2973,7 @@
                 
                 if (editPrevList) {
                     editPrevList.querySelectorAll('.project-item').forEach(item => {
-                        if (item.querySelector('span').textContent === vehicle.previousProject) {
+                        if (item.textContent === vehicle.previousProject) {
                             item.classList.add('selected');
                         }
                     });
@@ -2912,7 +2981,7 @@
                 
                 if (editCurrList) {
                     editCurrList.querySelectorAll('.project-item').forEach(item => {
-                        if (item.querySelector('span').textContent === vehicle.currentProject) {
+                        if (item.textContent === vehicle.currentProject) {
                             item.classList.add('selected');
                         }
                     });
@@ -2944,7 +3013,7 @@
             const pendingBody = document.getElementById('pendingBody');
             if (!pendingBody) return;
             
-            pendingBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px;">جارٍ التحميل...</td></tr>';
+            pendingBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 30px;">جارٍ التحميل...</td></tr>';
             
             const usersRef = database.ref('users');
             const snapshot = await usersRef.once('value');
@@ -2960,7 +3029,7 @@
                         pendingCount++;
                         const registerDate = user.createdAt ? 
                             new Date(user.createdAt).toLocaleDateString(currentLanguage === 'ar' ? 'ar-SA' : 'en-US') : 
-                            translate('unknown');
+                            'غير معروف';
                         
                         const row = document.createElement('tr');
                         row.innerHTML = `
@@ -2988,7 +3057,7 @@
             document.getElementById('pendingCount').textContent = pendingCount;
             
             if (pendingCount === 0) {
-                pendingBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px;">${translate('noPendingRequests')}</td></tr>`;
+                pendingBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px;">لا توجد طلبات معلقة</td></tr>`;
             }
         }
 
@@ -3012,7 +3081,7 @@
                         usersCount++;
                         const lastLogin = user.lastLogin ? 
                             new Date(user.lastLogin).toLocaleString(currentLanguage === 'ar' ? 'ar-SA' : 'en-US') : 
-                            translate('neverLoggedIn');
+                            'لم يسجل دخول';
                         const statusClass = user.status === 'active' ? 'status-active' : 
                                            user.status === 'pending' ? 'status-pending' : 'status-inactive';
                         
@@ -3053,7 +3122,7 @@
             document.getElementById('usersCount').textContent = usersCount;
             
             if (usersCount === 0) {
-                usersBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">${translate('noUsersRegistered')}</td></tr>`;
+                usersBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">لا يوجد مستخدمون مسجلون</td></tr>`;
             }
             
             // تحديث قائمة التصفية للمستخدمين
@@ -3087,7 +3156,7 @@
             const userVehicleDataBody = document.getElementById('userVehicleDataBody');
             if (!userVehicleDataBody) return;
             
-            userVehicleDataBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px;">جارٍ التحميل...</td></tr>';
+            userVehicleDataBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px;">جارٍ التحميل...</td></tr>';
             
             const vehiclesRef = database.ref('vehicles');
             const snapshot = await vehiclesRef.once('value');
@@ -3118,9 +3187,8 @@
                         <td>${vehicle.area}</td>
                         <td>${vehicle.previousProject}</td>
                         <td>${vehicle.currentProject}</td>
-                        <td>${vehicle.basicFuelQuota} ${translate('fuelUnit')}</td>
                         <td><span class="timestamp-cell">${lastUpdate}</span></td>
-                        <td><div style="max-height: 100px; overflow-y: auto; font-size: 0.85rem;">${historyText || translate('noHistory')}</div></td>
+                        <td><div style="max-height: 100px; overflow-y: auto; font-size: 0.85rem;">${historyText || 'لا يوجد سجل تحديثات'}</div></td>
                     `;
                     userVehicleDataBody.appendChild(row);
                 });
@@ -3129,7 +3197,7 @@
             document.getElementById('vehicleDataCount').textContent = vehicleDataCount;
             
             if (vehicleDataCount === 0) {
-                userVehicleDataBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 40px;">${translate('noVehicleData')}</td></tr>`;
+                userVehicleDataBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">لا توجد بيانات مركبات</td></tr>`;
             }
         }
 
@@ -3146,10 +3214,10 @@
             
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
-                if (cells.length < 8) return;
+                if (cells.length < 7) return;
                 
                 const username = cells[0].textContent.trim();
-                const lastUpdateCell = cells[6].querySelector('.timestamp-cell');
+                const lastUpdateCell = cells[5].querySelector('.timestamp-cell');
                 const lastUpdate = lastUpdateCell ? lastUpdateCell.textContent : '';
                 
                 const userMatch = !selectedUser || username === selectedUser;
@@ -3172,10 +3240,10 @@
         }
 
         async function deactivateUser(userId) {
-            if (confirm(translate('confirmDeactivate'))) {
+            if (confirm('هل أنت متأكد من تعطيل هذا المستخدم؟')) {
                 const userRef = database.ref('users/' + userId);
                 await userRef.update({ status: 'inactive' });
-                showMessage('dashboardMessage', translate('userDeactivated'), 'success');
+                showMessage('dashboardMessage', 'تم تعطيل المستخدم بنجاح', 'success');
                 loadAllUsers();
             }
         }
@@ -3183,7 +3251,7 @@
         async function activateUser(userId) {
             const userRef = database.ref('users/' + userId);
             await userRef.update({ status: 'active' });
-            showMessage('dashboardMessage', translate('userActivated'), 'success');
+            showMessage('dashboardMessage', 'تم تفعيل المستخدم بنجاح', 'success');
             loadAllUsers();
         }
 
@@ -3215,57 +3283,6 @@
         }
 
         window.onload = initApp;
-
-        // إضافة الترجمات المفقودة
-        translations.ar.enterAreaName = "الرجاء إدخال اسم المنطقة";
-        translations.ar.areaExists = "هذه المنطقة موجودة بالفعل";
-        translations.ar.areaAdded = "تمت إضافة المنطقة";
-        translations.ar.enterProjectName = "الرجاء إدخال اسم المشروع";
-        translations.ar.projectExists = "هذا المشروع موجود بالفعل";
-        translations.ar.projectAdded = "تمت إضافة المشروع";
-        translations.ar.noResults = "لا توجد نتائج - يمكنك إضافة مشروع جديد";
-        translations.ar.selectProject = "الرجاء اختيار أو إضافة مشروع";
-        translations.ar.selectBothProjects = "الرجاء اختيار المشروع السابق والحالي";
-        translations.ar.incorrectPassword = "كلمة المرور الحالية غير صحيحة";
-        translations.ar.pendingApproval = "الحساب قيد الانتظار للموافقة";
-        translations.ar.invalidCredentials = "اسم المستخدم أو كلمة المرور غير صحيحة";
-        translations.ar.noUsers = "لا يوجد مستخدمون مسجلون";
-        translations.ar.unknown = "غير معروف";
-        translations.ar.noPendingRequests = "لا توجد طلبات معلقة";
-        translations.ar.neverLoggedIn = "لم يسجل دخول";
-        translations.ar.noUsersRegistered = "لا يوجد مستخدمون مسجلون";
-        translations.ar.confirmDeactivate = "هل أنت متأكد من تعطيل هذا المستخدم؟";
-        translations.ar.noRecords = "لا توجد سجلات مركبات";
-        translations.ar.noHistory = "لا يوجد سجل تحديثات";
-        translations.ar.noVehicleData = "لا توجد بيانات مركبات";
-        translations.ar.statusWarning = "تحذير";
-        translations.ar.userDeactivated = "تم تعطيل المستخدم بنجاح";
-        translations.ar.userActivated = "تم تفعيل المستخدم بنجاح";
-
-        translations.en.enterAreaName = "Please enter area name";
-        translations.en.areaExists = "This area already exists";
-        translations.en.areaAdded = "Area added";
-        translations.en.enterProjectName = "Please enter project name";
-        translations.en.projectExists = "This project already exists";
-        translations.en.projectAdded = "Project added";
-        translations.en.noResults = "No results - you can add a new project";
-        translations.en.selectProject = "Please select or add a project";
-        translations.en.selectBothProjects = "Please select both previous and current projects";
-        translations.en.incorrectPassword = "Current password is incorrect";
-        translations.en.pendingApproval = "Account is pending approval";
-        translations.en.invalidCredentials = "Username or password is incorrect";
-        translations.en.noUsers = "No registered users";
-        translations.en.unknown = "Unknown";
-        translations.en.noPendingRequests = "No pending requests";
-        translations.en.neverLoggedIn = "Never logged in";
-        translations.en.noUsersRegistered = "No registered users";
-        translations.en.confirmDeactivate = "Are you sure you want to deactivate this user?";
-        translations.en.noRecords = "No vehicle records found";
-        translations.en.noHistory = "No update history";
-        translations.en.noVehicleData = "No vehicle data found";
-        translations.en.statusWarning = "Warning";
-        translations.en.userDeactivated = "User deactivated successfully";
-        translations.en.userActivated = "User activated successfully";
     </script>
 </body>
 </html>
