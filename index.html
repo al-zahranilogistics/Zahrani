@@ -864,6 +864,99 @@
             border: 2px solid #ffd54f;
         }
 
+        /* Bulk Update Styles */
+        .selection-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .selection-option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selection-option:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .selection-option.active {
+            border-color: var(--primary);
+            background: rgba(26, 35, 126, 0.05);
+            box-shadow: 0 4px 12px rgba(26, 35, 126, 0.15);
+        }
+
+        .selection-option i {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .selection-option span {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .selection-option small {
+            color: #666;
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+
+        /* Checkbox Styles */
+        .vehicle-checkbox {
+            text-align: center;
+        }
+
+        .vehicle-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* Vehicle Count */
+        #vehicleCountInfo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        #vehicleCountInfo > div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        #updateInfo {
+            padding: 8px 12px;
+            background: #fff3e0;
+            border-radius: 6px;
+            border: 1px solid #ffb74d;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #updateInfo i {
+            color: #ff9800;
+        }
+
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -913,6 +1006,10 @@
             .content-section {
                 padding: 25px;
             }
+            
+            .selection-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         @media (max-width: 768px) {
@@ -955,6 +1052,10 @@
             .action-buttons {
                 flex-direction: column;
                 gap: 8px;
+            }
+            
+            .selection-options {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -1380,6 +1481,7 @@
                 <span data-i18n="updateVehicleStatus">تحديث حالة المركبة</span>
             </h2>
             
+            <!-- Individual Status Update -->
             <div class="vehicle-status-section">
                 <form id="vehicleStatusForm">
                     <div class="form-row">
@@ -1408,6 +1510,105 @@
                         <span data-i18n="updateStatus">تحديث حالة المركبة</span>
                     </button>
                 </form>
+            </div>
+            
+            <!-- Bulk Update Controls -->
+            <div class="bulk-update-section" style="background: #f8f9fa; border-radius: var(--radius); padding: 25px; margin: 40px 0 20px; border: 2px solid #e0e0e0;">
+                <h3 style="color: var(--primary); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-sync-alt"></i>
+                    <span data-i18n="bulkUpdate">تحديث جماعي للمركبات</span>
+                </h3>
+                
+                <!-- Selection Options -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="updateOption">خيار التحديث:</label>
+                        <div class="selection-options">
+                            <button type="button" class="selection-option active" onclick="selectUpdateOption('all', this)">
+                                <i class="fas fa-globe"></i>
+                                <span data-i18n="allVehicles">الكل</span>
+                                <small data-i18n="allVehiclesDesc">تحديث جميع المركبات</small>
+                            </button>
+                            <button type="button" class="selection-option" onclick="selectUpdateOption('working', this)">
+                                <i class="fas fa-play-circle"></i>
+                                <span data-i18n="workingOnly">التي تعمل فقط</span>
+                                <small data-i18n="workingOnlyDesc">تحديث المركبات التي حالةها "تعمل"</small>
+                            </button>
+                            <button type="button" class="selection-option" onclick="selectUpdateOption('stopped', this)">
+                                <i class="fas fa-stop-circle"></i>
+                                <span data-i18n="stoppedOnly">المتوقفة فقط</span>
+                                <small data-i18n="stoppedOnlyDesc">تحديث المركبات التي حالةها "متوقفة"</small>
+                            </button>
+                            <button type="button" class="selection-option" onclick="selectUpdateOption('manual', this)">
+                                <i class="fas fa-hand-pointer"></i>
+                                <span data-i18n="manualSelect">المحددة يدوياً</span>
+                                <small data-i18n="manualSelectDesc">تحديد مركبات محددة من الجدول</small>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- New Status Selection -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="newStatus">الحالة الجديدة:</label>
+                        <select id="bulkNewStatus" class="form-input" style="width: 100%;" onchange="updateVehicleSelection()">
+                            <option value="" data-i18n="selectStatus">اختر الحالة</option>
+                            <option value="working" data-i18n="working">تعمل/Working</option>
+                            <option value="stopped" data-i18n="stopped">متوقفة/Stopped</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="bulkNotes">ملاحظات التحديث:</label>
+                        <textarea id="bulkStatusNotes" class="form-input" rows="2" placeholder="أدخل ملاحظات عامة للتحديث..." data-i18n-ph="enterBulkNotes"></textarea>
+                    </div>
+                </div>
+                
+                <!-- Vehicle Count and Actions -->
+                <div class="form-row" style="align-items: center;">
+                    <div class="form-group" style="flex: 1;">
+                        <div id="vehicleCountInfo">
+                            <div style="background: var(--info); color: white; padding: 8px 15px; border-radius: 6px;">
+                                <i class="fas fa-car"></i>
+                                <span id="selectedCount">0</span> / <span id="totalCount">0</span>
+                                <span data-i18n="vehicles">مركبة</span>
+                            </div>
+                            <div id="updateInfo">
+                                <i class="fas fa-info-circle"></i>
+                                <span data-i18n="smartUpdate">سيتم تحديث فقط المركبات التي تحتاج للتغيير</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-warning" onclick="confirmBulkUpdate()" id="bulkUpdateBtn" disabled>
+                            <i class="fas fa-sync-alt"></i>
+                            <span data-i18n="updateSelected">تحديث المركبات المحددة</span>
+                            (<span id="bulkCount">0</span>)
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Vehicle Selection Table -->
+            <div class="table-container" style="margin-top: 20px;" id="selectionTableContainer">
+                <table class="data-table" id="selectionTable">
+                    <thead>
+                        <tr>
+                            <th width="50" id="selectAllHeader" style="display: none;">
+                                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)">
+                            </th>
+                            <th data-i18n="plateNumber">رقم اللوحة</th>
+                            <th data-i18n="area">المنطقة</th>
+                            <th data-i18n="currentProject">المشروع الحالي</th>
+                            <th data-i18n="vehicleStatus">حالة المركبة</th>
+                            <th data-i18n="lastUpdate">آخر تحديث</th>
+                            <th width="100" data-i18n="needsUpdate">يحتاج تحديث؟</th>
+                        </tr>
+                    </thead>
+                    <tbody id="selectionBody">
+                        <!-- Vehicles will be loaded here -->
+                    </tbody>
+                </table>
             </div>
             
             <!-- Recent Status Updates -->
@@ -2038,6 +2239,25 @@
                 chipRequestSubmitted: "تم إرسال طلب الشريحة بنجاح",
                 chipRequestUpdated: "تم تحديث حالة طلب الشريحة",
                 
+                // Bulk Update
+                bulkUpdate: "تحديث جماعي للمركبات",
+                updateOption: "خيار التحديث:",
+                allVehicles: "الكل",
+                allVehiclesDesc: "تحديث جميع المركبات",
+                workingOnly: "التي تعمل فقط",
+                workingOnlyDesc: "تحديث المركبات التي حالةها \"تعمل\"",
+                stoppedOnly: "المتوقفة فقط",
+                stoppedOnlyDesc: "تحديث المركبات التي حالةها \"متوقفة\"",
+                manualSelect: "المحددة يدوياً",
+                manualSelectDesc: "تحديد مركبات محددة من الجدول",
+                newStatus: "الحالة الجديدة:",
+                bulkNotes: "ملاحظات التحديث:",
+                enterBulkNotes: "أدخل ملاحظات عامة للتحديث...",
+                vehicles: "مركبة",
+                smartUpdate: "سيتم تحديث فقط المركبات التي تحتاج للتغيير",
+                updateSelected: "تحديث المركبات المحددة",
+                needsUpdate: "يحتاج تحديث؟",
+                
                 // General
                 add: "إضافة",
                 enterUsername: "أدخل اسم المستخدم",
@@ -2234,6 +2454,25 @@
                 chipRequestSubmitted: "Chip request submitted successfully",
                 chipRequestUpdated: "Chip request status updated",
                 
+                // Bulk Update
+                bulkUpdate: "Bulk Vehicle Update",
+                updateOption: "Update Option:",
+                allVehicles: "All",
+                allVehiclesDesc: "Update all vehicles",
+                workingOnly: "Working Only",
+                workingOnlyDesc: "Update vehicles with \"Working\" status",
+                stoppedOnly: "Stopped Only",
+                stoppedOnlyDesc: "Update vehicles with \"Stopped\" status",
+                manualSelect: "Manual Selection",
+                manualSelectDesc: "Select specific vehicles from table",
+                newStatus: "New Status:",
+                bulkNotes: "Update Notes:",
+                enterBulkNotes: "Enter general update notes...",
+                vehicles: "vehicles",
+                smartUpdate: "Only vehicles that need change will be updated",
+                updateSelected: "Update Selected Vehicles",
+                needsUpdate: "Needs Update?",
+                
                 // General
                 add: "Add",
                 enterUsername: "Enter username",
@@ -2406,6 +2645,11 @@
         let existingVehiclesMap = {};
         let selectedProject = '';
         let selectedArea = '';
+
+        // Global variables for bulk update
+        let bulkUpdateOption = 'all';
+        let selectedVehicles = new Set();
+        let allVehiclesData = [];
 
         // تهيئة التطبيق
         function initApp() {
@@ -2810,6 +3054,9 @@
                     loadAllUsers();
                     loadUserVehicleData();
                     loadAdminChipRequests();
+                }
+                if (document.getElementById('vehicleStatusSection').classList.contains('active')) {
+                    loadVehiclesForBulkUpdate();
                 }
             }
         }
@@ -3229,6 +3476,63 @@
             const timestamp = Date.now();
             const random = Math.floor(Math.random() * 1000);
             return `REQ-${timestamp}-${random}`;
+        }
+
+        // تحديث: دالة جديدة لتحديث حالة المركبة بشكل فردي
+        async function updateVehicleStatusIndividual(vehicleId, newStatus, notes) {
+            try {
+                const vehicleRef = database.ref('vehicles/' + vehicleId);
+                const snapshot = await vehicleRef.once('value');
+                const vehicle = snapshot.val();
+                
+                if (!vehicle) {
+                    console.error('Vehicle not found:', vehicleId);
+                    return false;
+                }
+                
+                // إذا كانت الحالة نفسها، لا تقم بالتحديث
+                if (vehicle.vehicleStatus === newStatus) {
+                    console.log('Status already matches, skipping:', vehicleId);
+                    return false;
+                }
+                
+                const now = new Date();
+                const updates = {
+                    vehicleStatus: newStatus,
+                    lastUpdatedBy: currentUser.username,
+                    lastUpdatedAt: now.toISOString()
+                };
+                
+                const updateEntry = {
+                    updatedBy: currentUser.username,
+                    updatedAt: now.toISOString(),
+                    changes: `Status changed from ${vehicle.vehicleStatus} to ${newStatus}`,
+                    notes: notes || ''
+                };
+                
+                const updateHistory = vehicle.updateHistory || [];
+                updateHistory.push(updateEntry);
+                updates.updateHistory = updateHistory;
+                
+                await vehicleRef.update(updates);
+                
+                // إضافة إلى سجل حالات المركبات
+                const statusHistoryRef = database.ref('vehicleStatusHistory');
+                await statusHistoryRef.push({
+                    plateNumber: vehicle.plateNumber,
+                    vehicleStatus: newStatus,
+                    statusNotes: notes || '',
+                    updatedBy: currentUser.username,
+                    updatedAt: now.toISOString(),
+                    vehicleId: vehicleId,
+                    bulkUpdate: true
+                });
+                
+                return true;
+            } catch (error) {
+                console.error('Error updating vehicle status:', error);
+                return false;
+            }
         }
 
         // البحث عن مركبة للحالة
@@ -3758,11 +4062,18 @@
             }
         }
 
-        // تحميل جميع السجلات كملف Excel
+        // تحميل جميع السجلات كملف Excel مع التحكم في الصلاحيات
         async function downloadAllRecords() {
             try {
-                const vehiclesRef = database.ref('vehicles');
-                const snapshot = await vehiclesRef.once('value');
+                let query = database.ref('vehicles');
+                
+                // للمشرفين: فقط المركبات التي أدخلوها
+                if (currentUser.role === 'supervisor') {
+                    query = query.orderByChild('createdBy').equalTo(currentUser.username);
+                }
+                // للمسؤول: جميع المركبات
+                
+                const snapshot = await query.once('value');
                 const vehicles = snapshot.val();
                 
                 const headers = [[
@@ -3814,8 +4125,12 @@
                 ];
                 ws['!cols'] = wscols;
                 
-                // تحميل الملف
-                const filename = `سجلات_المركبات_${new Date().toISOString().slice(0,10)}.xlsx`;
+                // إضافة اسم المستخدم لاسم الملف
+                const username = currentUser.username.replace(/[^a-zA-Z0-9]/g, '_');
+                const filename = currentUser.role === 'admin' 
+                    ? `سجلات_المركبات_${new Date().toISOString().slice(0,10)}.xlsx`
+                    : `سجلات_المركبات_${username}_${new Date().toISOString().slice(0,10)}.xlsx`;
+                
                 XLSX.writeFile(wb, filename);
                 showMessage('dashboardMessage', `تم تحميل ${data.length} سجل بنجاح`, 'success');
                 
@@ -3911,6 +4226,11 @@
             const section = document.getElementById(sectionId);
             if (section) {
                 section.classList.add('active');
+                
+                // Load vehicles for bulk update when showing status section
+                if (sectionId === 'vehicleStatusSection') {
+                    loadVehiclesForBulkUpdate();
+                }
             }
         }
 
@@ -5021,6 +5341,338 @@
             document.getElementById('registerForm').reset();
         }
 
+        // ===== دوال التحديث الجماعي - مصححة =====
+
+        // Select update option
+        function selectUpdateOption(option, element) {
+            bulkUpdateOption = option;
+            
+            // Update button states
+            document.querySelectorAll('.selection-option').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            element.classList.add('active');
+            
+            // Show/hide checkboxes
+            const showCheckboxes = option === 'manual';
+            document.getElementById('selectAllHeader').style.display = showCheckboxes ? 'table-cell' : 'none';
+            document.querySelectorAll('.vehicle-checkbox').forEach(cb => {
+                cb.style.display = showCheckboxes ? 'table-cell' : 'none';
+            });
+            
+            // Update selection
+            updateVehicleSelection();
+        }
+
+        // Load vehicles for bulk update
+        async function loadVehiclesForBulkUpdate() {
+            const selectionBody = document.getElementById('selectionBody');
+            if (!selectionBody) return;
+            
+            selectionBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px;">جارٍ تحميل المركبات...</td></tr>';
+            
+            let query = database.ref('vehicles');
+            if (currentUser.role === 'supervisor') {
+                query = query.orderByChild('createdBy').equalTo(currentUser.username);
+            }
+            
+            const snapshot = await query.once('value');
+            const vehicles = snapshot.val();
+            
+            allVehiclesData = [];
+            selectionBody.innerHTML = '';
+            selectedVehicles.clear();
+            
+            if (vehicles) {
+                Object.keys(vehicles).forEach(key => {
+                    const vehicle = vehicles[key];
+                    vehicle.id = key;
+                    allVehiclesData.push(vehicle);
+                    
+                    const lastUpdate = vehicle.lastUpdatedAt ? 
+                        new Date(vehicle.lastUpdatedAt).toLocaleString(currentLanguage === 'ar' ? 'ar-SA' : 'en-US') : 
+                        new Date(vehicle.createdAt).toLocaleString(currentLanguage === 'ar' ? 'ar-SA' : 'en-US');
+                    
+                    const statusBadge = vehicle.vehicleStatus === 'working' ? 
+                        '<span class="status-badge status-working">تعمل/Working</span>' : 
+                        '<span class="status-badge status-stopped">متوقفة/Stopped</span>';
+                    
+                    const row = document.createElement('tr');
+                    row.dataset.vehicleId = key;
+                    row.dataset.currentStatus = vehicle.vehicleStatus;
+                    
+                    row.innerHTML = `
+                        <td class="vehicle-checkbox" style="display: none; text-align: center;">
+                            <input type="checkbox" class="vehicle-select" onchange="updateVehicleSelection()" data-vehicle-id="${key}">
+                        </td>
+                        <td><strong>${vehicle.plateNumber}</strong></td>
+                        <td>${vehicle.area}</td>
+                        <td>${vehicle.currentProject}</td>
+                        <td>${statusBadge}</td>
+                        <td><span class="timestamp-cell">${lastUpdate}</span></td>
+                        <td id="needsUpdate-${key}">
+                            <span class="status-badge status-pending">يتم التحقق...</span>
+                        </td>
+                    `;
+                    selectionBody.appendChild(row);
+                });
+            } else {
+                selectionBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">لا توجد مركبات</td></tr>`;
+            }
+            
+            document.getElementById('totalCount').textContent = allVehiclesData.length;
+            updateVehicleSelection();
+        }
+
+        // Update vehicle selection based on current option - مصححة
+        function updateVehicleSelection() {
+            const newStatus = document.getElementById('bulkNewStatus').value;
+            selectedVehicles.clear();
+            
+            if (!newStatus) {
+                document.getElementById('selectedCount').textContent = '0';
+                document.getElementById('bulkCount').textContent = '0';
+                document.getElementById('bulkUpdateBtn').disabled = true;
+                document.getElementById('updateInfo').style.display = 'none';
+                
+                // إعادة تعليم جميع المركبات بـ "يتم التحقق"
+                allVehiclesData.forEach(vehicle => {
+                    const needsUpdateCell = document.getElementById(`needsUpdate-${vehicle.id}`);
+                    if (needsUpdateCell) {
+                        needsUpdateCell.innerHTML = '<span class="status-badge status-pending">يتم التحقق...</span>';
+                    }
+                });
+                return;
+            }
+            
+            let count = 0;
+            let needsUpdateCount = 0;
+            
+            allVehiclesData.forEach(vehicle => {
+                let shouldSelect = false;
+                let needsUpdate = false;
+                
+                // التحقق من أن المركبة تستوفي شروط الخيار المحدد
+                const statusMatch = (bulkUpdateOption === 'working' && vehicle.vehicleStatus === 'working') ||
+                                   (bulkUpdateOption === 'stopped' && vehicle.vehicleStatus === 'stopped') ||
+                                   (bulkUpdateOption === 'all');
+                
+                if (bulkUpdateOption === 'manual') {
+                    const checkbox = document.querySelector(`.vehicle-select[data-vehicle-id="${vehicle.id}"]`);
+                    shouldSelect = checkbox ? checkbox.checked : false;
+                    needsUpdate = shouldSelect && vehicle.vehicleStatus !== newStatus;
+                } else if (statusMatch) {
+                    shouldSelect = true;
+                    needsUpdate = vehicle.vehicleStatus !== newStatus;
+                }
+                
+                if (shouldSelect) {
+                    selectedVehicles.add(vehicle.id);
+                    count++;
+                    
+                    if (needsUpdate) {
+                        needsUpdateCount++;
+                    }
+                }
+                
+                // تحديث مؤشر "يحتاج تحديث"
+                const needsUpdateCell = document.getElementById(`needsUpdate-${vehicle.id}`);
+                if (needsUpdateCell) {
+                    if (vehicle.vehicleStatus === newStatus) {
+                        needsUpdateCell.innerHTML = '<span class="status-badge status-active">لا يحتاج</span>';
+                    } else if (statusMatch || (bulkUpdateOption === 'manual' && shouldSelect)) {
+                        needsUpdateCell.innerHTML = '<span class="status-badge status-warning">يحتاج تحديث</span>';
+                    } else {
+                        needsUpdateCell.innerHTML = '<span class="status-badge status-inactive">غير مطلوب</span>';
+                    }
+                }
+            });
+            
+            document.getElementById('selectedCount').textContent = count;
+            document.getElementById('bulkCount').textContent = needsUpdateCount;
+            document.getElementById('updateInfo').style.display = needsUpdateCount > 0 ? 'flex' : 'none';
+            document.getElementById('bulkUpdateBtn').disabled = needsUpdateCount === 0;
+        }
+
+        // Toggle select all
+        function toggleSelectAll(checkbox) {
+            const checkboxes = document.querySelectorAll('.vehicle-select');
+            checkboxes.forEach(cb => {
+                cb.checked = checkbox.checked;
+            });
+            updateVehicleSelection();
+        }
+
+        // Confirm bulk update
+        function confirmBulkUpdate() {
+            const newStatus = document.getElementById('bulkNewStatus').value;
+            const notes = document.getElementById('bulkStatusNotes').value;
+            const needsUpdateCount = parseInt(document.getElementById('bulkCount').textContent);
+            
+            if (needsUpdateCount === 0) {
+                showMessage('dashboardMessage', 'لا توجد مركبات تحتاج للتحديث', 'info');
+                return;
+            }
+            
+            const statusText = newStatus === 'working' ? 'تعمل' : 'متوقفة';
+            const currentOptionText = bulkUpdateOption === 'all' ? 'جميع المركبات' :
+                             bulkUpdateOption === 'working' ? 'المركبات التي تعمل فقط' :
+                             bulkUpdateOption === 'stopped' ? 'المركبات المتوقفة فقط' : 'المركبات المحددة يدوياً';
+            
+            const confirmationMessage = `
+                <div style="text-align: right; padding: 20px;">
+                    <h3 style="color: var(--primary); margin-bottom: 15px;">تأكيد التحديث الجماعي</h3>
+                    <p><strong>خيار التحديث:</strong> ${currentOptionText}</p>
+                    <p><strong>الحالة الجديدة:</strong> ${statusText}</p>
+                    <p><strong>عدد المركبات التي سيتم تحديثها:</strong> ${needsUpdateCount}</p>
+                    ${notes ? `<p><strong>الملاحظات:</strong> ${notes}</p>` : ''}
+                    <p style="color: var(--warning); margin-top: 20px;">هل أنت متأكد من تنفيذ هذا التحديث؟</p>
+                </div>
+            `;
+            
+            // إنشاء مودال تأكيد مخصص
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h2><i class="fas fa-exclamation-triangle"></i> تأكيد التحديث</h2>
+                        <button class="close-modal" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        ${confirmationMessage}
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn btn-success" onclick="this.closest('.modal-overlay').remove(); performBulkUpdate('${newStatus}', '${notes}')" style="flex: 1;">
+                                <i class="fas fa-check"></i> تأكيد التحديث
+                            </button>
+                            <button class="btn btn-danger" onclick="this.closest('.modal-overlay').remove()" style="flex: 1;">
+                                <i class="fas fa-times"></i> إلغاء
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Perform bulk update - مصححة
+        async function performBulkUpdate(newStatus, notes) {
+            showMessage('dashboardMessage', 'جارٍ تحديث المركبات...', 'info');
+            
+            const now = new Date();
+            let successCount = 0;
+            let errorCount = 0;
+            let skippedCount = 0;
+            
+            // إنشاء مصفوفة من المركبات المحددة للتحديث
+            const vehiclesToUpdate = Array.from(selectedVehicles);
+            
+            console.log('Vehicles to update:', vehiclesToUpdate);
+            
+            for (const vehicleId of vehiclesToUpdate) {
+                try {
+                    // البحث عن بيانات المركبة
+                    const vehicle = allVehiclesData.find(v => v.id === vehicleId);
+                    if (!vehicle) {
+                        console.error('Vehicle not found in local data:', vehicleId);
+                        continue;
+                    }
+                    
+                    // التحقق إذا كانت الحالة الجديدة تختلف عن الحالة الحالية
+                    if (vehicle.vehicleStatus === newStatus) {
+                        console.log(`Skipping ${vehicle.plateNumber} - already ${newStatus}`);
+                        skippedCount++;
+                        continue;
+                    }
+                    
+                    // تحديث الحالة في قاعدة البيانات
+                    const vehicleRef = database.ref('vehicles/' + vehicleId);
+                    
+                    const updates = {
+                        vehicleStatus: newStatus,
+                        lastUpdatedBy: currentUser.username,
+                        lastUpdatedAt: now.toISOString()
+                    };
+                    
+                    const updateEntry = {
+                        updatedBy: currentUser.username,
+                        updatedAt: now.toISOString(),
+                        changes: `Bulk update: Status changed from ${vehicle.vehicleStatus} to ${newStatus}`,
+                        notes: notes || 'Bulk update'
+                    };
+                    
+                    const updateHistory = vehicle.updateHistory || [];
+                    updateHistory.push(updateEntry);
+                    updates.updateHistory = updateHistory;
+                    
+                    await vehicleRef.update(updates);
+                    
+                    // إضافة إلى سجل حالات المركبات
+                    const statusHistoryRef = database.ref('vehicleStatusHistory');
+                    await statusHistoryRef.push({
+                        plateNumber: vehicle.plateNumber,
+                        vehicleStatus: newStatus,
+                        statusNotes: notes || 'Bulk update',
+                        updatedBy: currentUser.username,
+                        updatedAt: now.toISOString(),
+                        vehicleId: vehicleId,
+                        bulkUpdate: true
+                    });
+                    
+                    successCount++;
+                    
+                    // تحديث البيانات المحلية فوراً
+                    vehicle.vehicleStatus = newStatus;
+                    vehicle.lastUpdatedAt = now.toISOString();
+                    vehicle.lastUpdatedBy = currentUser.username;
+                    
+                    // تحديث واجهة المستخدم فوراً
+                    const row = document.querySelector(`tr[data-vehicle-id="${vehicleId}"]`);
+                    if (row) {
+                        const statusCell = row.querySelector('td:nth-child(5)');
+                        if (statusCell) {
+                            statusCell.innerHTML = newStatus === 'working' ? 
+                                '<span class="status-badge status-working">تعمل/Working</span>' : 
+                                '<span class="status-badge status-stopped">متوقفة/Stopped</span>';
+                        }
+                        
+                        const needsUpdateCell = document.getElementById(`needsUpdate-${vehicleId}`);
+                        if (needsUpdateCell) {
+                            needsUpdateCell.innerHTML = '<span class="status-badge status-active">تم التحديث</span>';
+                        }
+                    }
+                    
+                } catch (error) {
+                    console.error('Error updating vehicle:', error, vehicleId);
+                    errorCount++;
+                }
+            }
+            
+            const message = `تم تحديث ${successCount} مركبة بنجاح${skippedCount > 0 ? `، تم تخطي ${skippedCount} مركبة` : ''}${errorCount > 0 ? `، فشل تحديث ${errorCount} مركبة` : ''}`;
+            showMessage('dashboardMessage', message, successCount > 0 ? 'success' : 'error');
+            
+            // تحديث العدادات
+            document.getElementById('selectedCount').textContent = '0';
+            document.getElementById('bulkCount').textContent = '0';
+            document.getElementById('bulkUpdateBtn').disabled = true;
+            
+            // تحديث سجلات المركبات وتاريخ الحالات بعد التحديث
+            setTimeout(() => {
+                loadVehicleRecords();
+                loadVehicleStatusHistory();
+                // إعادة تحميل بيانات التحديث الجماعي
+                loadVehiclesForBulkUpdate();
+            }, 1500);
+        }
+
+        // تحديث: إضافة حدث تغيير للحالة الجديدة
+        document.getElementById('bulkNewStatus').addEventListener('change', function() {
+            updateVehicleSelection();
+        });
+
+        // تهيئة التطبيق عند تحميل الصفحة
         window.onload = initApp;
     </script>
 </body>
