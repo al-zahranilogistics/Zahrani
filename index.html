@@ -957,6 +957,48 @@
             color: #ff9800;
         }
 
+        /* Duplicate Detection */
+        .duplicate-section {
+            background: #fff3e0;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #ffb74d;
+        }
+
+        .duplicate-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .duplicate-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .duplicate-item {
+            padding: 12px 15px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ffd54f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .duplicate-count {
+            background: var(--warning);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -1383,6 +1425,10 @@
                             <i class="fas fa-sync-alt"></i>
                             <span data-i18n="updateData">تحديث البيانات الموجودة</span>
                         </button>
+                        <button class="btn btn-danger" onclick="removeDuplicatesFromExcel()">
+                            <i class="fas fa-filter"></i>
+                            <span data-i18n="removeDuplicates">إزالة اللوحات المكررة</span>
+                        </button>
                     </div>
                 </div>
                 <div id="excelStats" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0;">
@@ -1390,8 +1436,31 @@
                         <div><strong>عدد المركبات:</strong> <span id="vehicleCount">0</span></div>
                         <div><strong>إدخالات جديدة:</strong> <span id="newEntriesCount">0</span></div>
                         <div><strong>تحديثات:</strong> <span id="updateEntriesCount">0</span></div>
+                        <div><strong>اللوحات المكررة:</strong> <span id="duplicateCount">0</span></div>
                     </div>
                 </div>
+                
+                <!-- Duplicate Detection Section -->
+                <div class="duplicate-section" id="duplicateSection" style="display: none;">
+                    <div class="duplicate-header">
+                        <h4 style="color: var(--warning); margin: 0;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span data-i18n="duplicatePlatesFound">تم العثور على لوحات مكررة</span>
+                        </h4>
+                        <div class="duplicate-actions">
+                            <button class="btn btn-warning btn-sm" onclick="keepFirstDuplicate()">
+                                <i class="fas fa-check"></i> حفظ أول ظهور فقط
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="removeAllDuplicates()">
+                                <i class="fas fa-trash"></i> حذف جميع المكررات
+                            </button>
+                        </div>
+                    </div>
+                    <div id="duplicatePlatesList">
+                        <!-- Duplicate plates will be listed here -->
+                    </div>
+                </div>
+                
                 <div class="table-container">
                     <table class="data-table" id="excelPreviewTable">
                         <thead>
@@ -1419,6 +1488,23 @@
                 <i class="fas fa-database"></i>
                 <span data-i18n="vehicleRecords">سجلات المركبات</span>
             </h2>
+            
+            <!-- Duplicate Check in Database -->
+            <div class="duplicate-section">
+                <div class="duplicate-header">
+                    <h4 style="color: var(--primary); margin: 0;">
+                        <i class="fas fa-search"></i>
+                        <span>البحث عن اللوحات المكررة في قاعدة البيانات</span>
+                    </h4>
+                    <button class="btn btn-warning" onclick="checkForDuplicatePlates()">
+                        <i class="fas fa-search"></i> فحص اللوحات المكررة
+                    </button>
+                </div>
+                <div id="databaseDuplicateResults" style="margin-top: 15px; display: none;">
+                    <!-- Duplicate results will be shown here -->
+                </div>
+            </div>
+            
             <div class="form-row" style="margin-bottom: 30px;">
                 <div class="form-group">
                     <label class="form-label" data-i18n="filterBy">تصفية حسب:</label>
@@ -1450,6 +1536,10 @@
                 <button class="btn btn-info" onclick="downloadAllRecords()">
                     <i class="fas fa-file-excel"></i>
                     <span data-i18n="downloadRecords">تحميل السجلات كملف Excel</span>
+                </button>
+                <button class="btn btn-warning" onclick="exportDuplicateReport()">
+                    <i class="fas fa-file-excel"></i>
+                    <span>تصدير تقرير اللوحات المكررة</span>
                 </button>
             </div>
             
@@ -1736,6 +1826,44 @@
                         <i class="fas fa-sim-card"></i>
                         <span data-i18n="downloadChipRequests">تحميل طلبات الشرائح</span>
                     </button>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-danger" onclick="cleanDatabaseDuplicates()">
+                        <i class="fas fa-filter"></i>
+                        <span>تنظيف اللوحات المكررة</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Duplicate Management -->
+            <div class="duplicate-section" style="margin-bottom: 30px;">
+                <div class="duplicate-header">
+                    <h4 style="color: var(--primary); margin: 0;">
+                        <i class="fas fa-filter"></i>
+                        <span>إدارة اللوحات المكررة في قاعدة البيانات</span>
+                    </h4>
+                </div>
+                <div class="form-row" style="margin-top: 15px;">
+                    <div class="form-group">
+                        <label class="form-label">إجراءات التنظيف:</label>
+                        <select id="cleanupAction" class="form-input">
+                            <option value="keep_first">حفظ أول ظهور وحذف البقية</option>
+                            <option value="keep_last">حفظ آخر ظهور وحذف البقية</option>
+                            <option value="merge">دمج البيانات (تجريبي)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">تحديث حتى تاريخ:</label>
+                        <input type="date" id="cleanupDate" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-warning" onclick="scanForDatabaseDuplicates()" style="margin-top: 28px;">
+                            <i class="fas fa-search"></i> فحص المكررات
+                        </button>
+                    </div>
+                </div>
+                <div id="databaseCleanupResults" style="margin-top: 15px; display: none;">
+                    <!-- Cleanup results will be shown here -->
                 </div>
             </div>
             
@@ -2118,6 +2246,8 @@
                 updateExisting: "تحديث موجود",
                 noVehicle: "لا يوجد",
                 downloadRecords: "تحميل السجلات كملف Excel",
+                removeDuplicates: "إزالة اللوحات المكررة",
+                duplicatePlatesFound: "تم العثور على لوحات مكررة",
                 
                 // Vehicle Status
                 updateVehicleStatus: "تحديث حالة المركبة",
@@ -2238,6 +2368,9 @@
                 statusUpdated: "تم تحديث حالة المركبة بنجاح",
                 chipRequestSubmitted: "تم إرسال طلب الشريحة بنجاح",
                 chipRequestUpdated: "تم تحديث حالة طلب الشريحة",
+                duplicatesRemoved: "تمت إزالة اللوحات المكررة",
+                duplicatesFound: "تم العثور على لوحات مكررة",
+                noDuplicatesFound: "لم يتم العثور على لوحات مكررة",
                 
                 // Bulk Update
                 bulkUpdate: "تحديث جماعي للمركبات",
@@ -2333,6 +2466,8 @@
                 updateExisting: "Update Existing",
                 noVehicle: "No Vehicle",
                 downloadRecords: "Download Records as Excel",
+                removeDuplicates: "Remove Duplicate Plates",
+                duplicatePlatesFound: "Duplicate plates found",
                 
                 // Vehicle Status
                 updateVehicleStatus: "Update Vehicle Status",
@@ -2453,6 +2588,9 @@
                 statusUpdated: "Vehicle status updated successfully",
                 chipRequestSubmitted: "Chip request submitted successfully",
                 chipRequestUpdated: "Chip request status updated",
+                duplicatesRemoved: "Duplicate plates removed successfully",
+                duplicatesFound: "Duplicate plates found",
+                noDuplicatesFound: "No duplicate plates found",
                 
                 // Bulk Update
                 bulkUpdate: "Bulk Vehicle Update",
@@ -2650,6 +2788,10 @@
         let bulkUpdateOption = 'all';
         let selectedVehicles = new Set();
         let allVehiclesData = [];
+
+        // New variables for duplicate detection
+        let duplicatePlatesInExcel = [];
+        let duplicatePlatesInDatabase = [];
 
         // تهيئة التطبيق
         function initApp() {
@@ -3623,6 +3765,9 @@
             
             const file = files[0];
             
+            // إعادة تعيين بيانات التكرار
+            duplicatePlatesInExcel = [];
+            
             if (file.type !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' &&
                 file.type !== 'application/vnd.ms-excel' &&
                 !file.name.match(/\.(xlsx|xls|csv)$/i)) {
@@ -3712,12 +3857,19 @@
                 excelOriginalData = [];
                 excelData = [];
                 
+                // كائن لتتبع اللوحات المكررة في الملف
+                const plateCounts = {};
+                const duplicatePlatesSet = new Set();
+                
                 for (let i = 0; i < dataRows.length; i++) {
                     const row = dataRows[i];
                     if (row.length === 0) continue;
                     
                     const plateNumber = String(row[plateCol] || '').trim();
                     if (!plateNumber) continue;
+                    
+                    // حساب عدد مرات ظهور اللوحة
+                    plateCounts[plateNumber] = (plateCounts[plateNumber] || 0) + 1;
                     
                     const previousProject = prevProjectCol !== -1 ? String(row[prevProjectCol] || '').trim() : 'لا يوجد/No Vehicle';
                     const currentProject = currProjectCol !== -1 ? String(row[currProjectCol] || '').trim() : 'لا يوجد/No Vehicle';
@@ -3735,11 +3887,24 @@
                         currentProject: currentProject || 'لا يوجد/No Vehicle',
                         area: area || '',
                         vehicleStatus: vehicleStatus || 'working',
-                        action: existingVehicles[plateNumber] ? translate('updateExisting') : translate('newEntry')
+                        action: existingVehicles[plateNumber] ? translate('updateExisting') : translate('newEntry'),
+                        rowIndex: i + 2 // +2 لأن الفهرس يبدأ من 1 وهناك سجل العناوين
                     };
                     
                     excelOriginalData.push(vehicleData);
                     excelData.push(vehicleData);
+                }
+                
+                // البحث عن اللوحات المكررة
+                duplicatePlatesInExcel = [];
+                for (const [plate, count] of Object.entries(plateCounts)) {
+                    if (count > 1) {
+                        duplicatePlatesInExcel.push({
+                            plateNumber: plate,
+                            count: count,
+                            rows: excelOriginalData.filter(v => v.plateNumber === plate)
+                        });
+                    }
                 }
                 
                 if (excelData.length === 0) {
@@ -3783,6 +3948,7 @@
             let newEntries = 0;
             let updateEntries = 0;
             
+            // إظهار جميع البيانات
             excelData.forEach((row, index) => {
                 const tr = document.createElement('tr');
                 
@@ -3799,8 +3965,11 @@
                 const projectWarning = (!row.previousProject && !row.currentProject) ? '⚠️ مشروع مفقود' : '';
                 const statusWarning = !row.vehicleStatus ? '⚠️ حالة مفقودة' : '';
                 
+                // التحقق إذا كانت اللوحة مكررة
+                const isDuplicate = duplicatePlatesInExcel.some(dp => dp.plateNumber === row.plateNumber);
+                
                 tr.innerHTML = `
-                    <td><strong>${row.plateNumber}</strong></td>
+                    <td><strong>${row.plateNumber}</strong> ${isDuplicate ? '⚠️' : ''}</td>
                     <td>${row.previousProject || 'لا يوجد/No Vehicle'}</td>
                     <td>${row.currentProject || 'لا يوجد/No Vehicle'}</td>
                     <td>${row.area || 'غير محدد'}</td>
@@ -3808,6 +3977,7 @@
                     <td><span class="status-badge ${isUpdate ? 'status-warning' : 'status-active'}">${row.action}</span></td>
                     <td style="color: ${areaWarning || projectWarning || statusWarning ? '#ff9800' : '#4caf50'}; font-size: 0.85rem;">
                         ${areaWarning} ${projectWarning ? '<br>' + projectWarning : ''} ${statusWarning ? '<br>' + statusWarning : ''}
+                        ${isDuplicate ? '<br>⚠️ لوحة مكررة' : ''}
                     </td>
                 `;
                 previewBody.appendChild(tr);
@@ -3817,15 +3987,130 @@
             document.getElementById('vehicleCount').textContent = excelData.length;
             document.getElementById('newEntriesCount').textContent = newEntries;
             document.getElementById('updateEntriesCount').textContent = updateEntries;
+            document.getElementById('duplicateCount').textContent = duplicatePlatesInExcel.length;
+            
+            // عرض قسم اللوحات المكررة إذا وجدت
+            const duplicateSection = document.getElementById('duplicateSection');
+            const duplicatePlatesList = document.getElementById('duplicatePlatesList');
+            
+            if (duplicatePlatesInExcel.length > 0) {
+                duplicateSection.style.display = 'block';
+                duplicatePlatesList.innerHTML = '';
+                
+                duplicatePlatesInExcel.forEach(dup => {
+                    const duplicateItem = document.createElement('div');
+                    duplicateItem.className = 'duplicate-item';
+                    duplicateItem.innerHTML = `
+                        <div>
+                            <strong>${dup.plateNumber}</strong>
+                            <div style="font-size: 0.85rem; color: #666; margin-top: 5px;">
+                                يظهر ${dup.count} مرة في الملف
+                            </div>
+                        </div>
+                        <div class="duplicate-count">${dup.count} مرات</div>
+                    `;
+                    duplicatePlatesList.appendChild(duplicateItem);
+                });
+            } else {
+                duplicateSection.style.display = 'none';
+            }
             
             document.getElementById('excelPreview').style.display = 'block';
             document.getElementById('excelPreview').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // إزالة اللوحات المكررة من بيانات Excel
+        function removeDuplicatesFromExcel() {
+            if (duplicatePlatesInExcel.length === 0) {
+                showMessage('dashboardMessage', 'لا توجد لوحات مكررة', 'info');
+                return;
+            }
+            
+            // إنشاء مجموعة للوحات الفريدة
+            const uniquePlates = new Set();
+            const newExcelData = [];
+            let removedCount = 0;
+            
+            // الاحتفاظ بأول ظهور لكل لوحة
+            excelOriginalData.forEach(vehicle => {
+                if (!uniquePlates.has(vehicle.plateNumber)) {
+                    uniquePlates.add(vehicle.plateNumber);
+                    newExcelData.push(vehicle);
+                } else {
+                    removedCount++;
+                }
+            });
+            
+            excelData = newExcelData;
+            duplicatePlatesInExcel = [];
+            
+            showExcelPreview();
+            showMessage('dashboardMessage', `تمت إزالة ${removedCount} لوحة مكررة`, 'success');
+        }
+
+        // الاحتفاظ بأول ظهور فقط
+        function keepFirstDuplicate() {
+            if (duplicatePlatesInExcel.length === 0) return;
+            
+            // إنشاء مجموعة للوحات الفريدة
+            const uniquePlates = new Set();
+            const newExcelData = [];
+            let keptCount = 0;
+            let removedCount = 0;
+            
+            // الاحتفاظ بأول ظهور لكل لوحة
+            excelOriginalData.forEach(vehicle => {
+                if (!uniquePlates.has(vehicle.plateNumber)) {
+                    uniquePlates.add(vehicle.plateNumber);
+                    newExcelData.push(vehicle);
+                    keptCount++;
+                } else {
+                    removedCount++;
+                }
+            });
+            
+            excelData = newExcelData;
+            duplicatePlatesInExcel = [];
+            
+            showExcelPreview();
+            showMessage('dashboardMessage', `تم الاحتفاظ بـ ${keptCount} لوحة وحذف ${removedCount} لوحة مكررة`, 'success');
+        }
+
+        // حذف جميع المكررات
+        function removeAllDuplicates() {
+            if (duplicatePlatesInExcel.length === 0) return;
+            
+            // إنشاء مجموعة للوحات المكررة
+            const duplicatePlatesSet = new Set();
+            duplicatePlatesInExcel.forEach(dp => {
+                duplicatePlatesSet.add(dp.plateNumber);
+            });
+            
+            // إزالة جميع اللوحات المكررة
+            const newExcelData = excelOriginalData.filter(vehicle => 
+                !duplicatePlatesSet.has(vehicle.plateNumber)
+            );
+            
+            const removedCount = excelOriginalData.length - newExcelData.length;
+            excelData = newExcelData;
+            duplicatePlatesInExcel = [];
+            
+            showExcelPreview();
+            showMessage('dashboardMessage', `تم حذف جميع اللوحات المكررة (${removedCount} لوحة)`, 'success');
         }
 
         async function uploadExcelData() {
             if (excelData.length === 0) {
                 showMessage('dashboardMessage', 'لا توجد بيانات لرفعها', 'error');
                 return;
+            }
+            
+            // التحقق من وجود لوحات مكررة قبل الرفع
+            if (duplicatePlatesInExcel.length > 0) {
+                const confirmUpload = confirm(`يوجد ${duplicatePlatesInExcel.length} لوحة مكررة في الملف. هل تريد المتابعة مع إمكانية وجود بيانات مكررة؟`);
+                if (!confirmUpload) {
+                    return;
+                }
             }
             
             showMessage('dashboardMessage', 'جارٍ رفع البيانات...', 'info');
@@ -3882,6 +4167,7 @@
             document.getElementById('excelPreview').style.display = 'none';
             document.getElementById('excelFileInput').value = '';
             excelData = [];
+            duplicatePlatesInExcel = [];
             loadVehicleRecords();
             
             if (currentUser.role === 'admin') {
@@ -3893,6 +4179,14 @@
             if (excelData.length === 0) {
                 showMessage('dashboardMessage', 'لا توجد بيانات لتحديثها', 'error');
                 return;
+            }
+            
+            // التحقق من وجود لوحات مكررة قبل التحديث
+            if (duplicatePlatesInExcel.length > 0) {
+                const confirmUpdate = confirm(`يوجد ${duplicatePlatesInExcel.length} لوحة مكررة في الملف. قد يؤدي هذا إلى بيانات غير متسقة. هل تريد المتابعة؟`);
+                if (!confirmUpdate) {
+                    return;
+                }
             }
             
             showMessage('dashboardMessage', 'جارٍ تحديث البيانات...', 'info');
@@ -3982,6 +4276,7 @@
             document.getElementById('excelPreview').style.display = 'none';
             document.getElementById('excelFileInput').value = '';
             excelData = [];
+            duplicatePlatesInExcel = [];
             loadVehicleRecords();
             
             if (currentUser.role === 'admin') {
@@ -4138,6 +4433,302 @@
                 console.error('Error downloading records:', error);
                 showMessage('dashboardMessage', 'حدث خطأ أثناء تحميل السجلات', 'error');
             }
+        }
+
+        // تصدير تقرير اللوحات المكررة
+        async function exportDuplicateReport() {
+            try {
+                // جلب جميع المركبات للتحقق من التكرار
+                const vehiclesRef = database.ref('vehicles');
+                const snapshot = await vehiclesRef.once('value');
+                const vehicles = snapshot.val();
+                
+                if (!vehicles) {
+                    showMessage('dashboardMessage', 'لا توجد بيانات لتصديرها', 'info');
+                    return;
+                }
+                
+                // تجميع اللوحات المكررة
+                const plateCounts = {};
+                const vehiclesByPlate = {};
+                
+                Object.values(vehicles).forEach(vehicle => {
+                    const plate = vehicle.plateNumber;
+                    plateCounts[plate] = (plateCounts[plate] || 0) + 1;
+                    
+                    if (!vehiclesByPlate[plate]) {
+                        vehiclesByPlate[plate] = [];
+                    }
+                    vehiclesByPlate[plate].push(vehicle);
+                });
+                
+                // البحث عن اللوحات المكررة
+                const duplicatePlates = Object.entries(plateCounts)
+                    .filter(([plate, count]) => count > 1)
+                    .map(([plate, count]) => ({ plate, count }));
+                
+                if (duplicatePlates.length === 0) {
+                    showMessage('dashboardMessage', 'لم يتم العثور على لوحات مكررة', 'info');
+                    return;
+                }
+                
+                // إنشاء التقرير
+                const headers = [[
+                    'رقم اللوحة/Plate Number',
+                    'عدد التكرارات/Duplicate Count',
+                    'المنطقة/Area',
+                    'المشروع الحالي/Current Project',
+                    'حالة المركبة/Vehicle Status',
+                    'أنشئ بواسطة/Created By',
+                    'تاريخ الإنشاء/Created At',
+                    'آخر تحديث/Last Update'
+                ]];
+                
+                const data = [];
+                
+                duplicatePlates.forEach(({ plate, count }) => {
+                    vehiclesByPlate[plate].forEach(vehicle => {
+                        const createdAt = vehicle.createdAt ? 
+                            new Date(vehicle.createdAt).toLocaleString('ar-SA') : 
+                            'غير معروف';
+                        const lastUpdate = vehicle.lastUpdatedAt ? 
+                            new Date(vehicle.lastUpdatedAt).toLocaleString('ar-SA') : 
+                            'غير معروف';
+                        
+                        data.push([
+                            vehicle.plateNumber || '',
+                            count,
+                            vehicle.area || '',
+                            vehicle.currentProject || '',
+                            vehicle.vehicleStatus === 'working' ? 'تعمل/Working' : 'متوقفة/Stopped',
+                            vehicle.createdBy || '',
+                            createdAt,
+                            lastUpdate
+                        ]);
+                    });
+                });
+                
+                const allData = headers.concat(data);
+                const ws = XLSX.utils.aoa_to_sheet(allData);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "اللوحات المكررة");
+                
+                // تحميل الملف
+                const filename = `تقرير_اللوحات_المكررة_${new Date().toISOString().slice(0,10)}.xlsx`;
+                XLSX.writeFile(wb, filename);
+                showMessage('dashboardMessage', `تم تصدير تقرير ${duplicatePlates.length} لوحة مكررة`, 'success');
+                
+            } catch (error) {
+                console.error('Error exporting duplicate report:', error);
+                showMessage('dashboardMessage', 'حدث خطأ أثناء تصدير التقرير', 'error');
+            }
+        }
+
+        // البحث عن اللوحات المكررة في قاعدة البيانات
+        async function checkForDuplicatePlates() {
+            try {
+                showMessage('dashboardMessage', 'جارٍ البحث عن اللوحات المكررة...', 'info');
+                
+                const vehiclesRef = database.ref('vehicles');
+                const snapshot = await vehiclesRef.once('value');
+                const vehicles = snapshot.val();
+                
+                if (!vehicles) {
+                    showMessage('dashboardMessage', 'لا توجد بيانات للفحص', 'info');
+                    return;
+                }
+                
+                // تجميع اللوحات المكررة
+                const plateCounts = {};
+                const vehiclesByPlate = {};
+                
+                Object.entries(vehicles).forEach(([key, vehicle]) => {
+                    const plate = vehicle.plateNumber;
+                    plateCounts[plate] = (plateCounts[plate] || 0) + 1;
+                    
+                    if (!vehiclesByPlate[plate]) {
+                        vehiclesByPlate[plate] = [];
+                    }
+                    vehiclesByPlate[plate].push({ key, ...vehicle });
+                });
+                
+                // البحث عن اللوحات المكررة
+                duplicatePlatesInDatabase = Object.entries(plateCounts)
+                    .filter(([plate, count]) => count > 1)
+                    .map(([plate, count]) => ({ 
+                        plate, 
+                        count,
+                        vehicles: vehiclesByPlate[plate]
+                    }));
+                
+                // عرض النتائج
+                const resultsDiv = document.getElementById('databaseDuplicateResults');
+                resultsDiv.innerHTML = '';
+                resultsDiv.style.display = 'block';
+                
+                if (duplicatePlatesInDatabase.length === 0) {
+                    resultsDiv.innerHTML = `
+                        <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; border: 1px solid #c8e6c9;">
+                            <i class="fas fa-check-circle"></i>
+                            <strong>لم يتم العثور على لوحات مكررة في قاعدة البيانات.</strong>
+                        </div>
+                    `;
+                    showMessage('dashboardMessage', 'لم يتم العثور على لوحات مكررة', 'success');
+                    return;
+                }
+                
+                let html = `
+                    <div style="background: #fff3e0; padding: 15px; border-radius: 8px; border: 1px solid #ffd54f; margin-bottom: 15px;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>تم العثور على ${duplicatePlatesInDatabase.length} لوحة مكررة:</strong>
+                    </div>
+                `;
+                
+                duplicatePlatesInDatabase.forEach((dup, index) => {
+                    html += `
+                        <div class="duplicate-item" style="margin-bottom: 10px;">
+                            <div>
+                                <strong>${index + 1}. ${dup.plateNumber}</strong>
+                                <div style="font-size: 0.85rem; color: #666; margin-top: 5px;">
+                                    تظهر ${dup.count} مرة في قاعدة البيانات
+                                </div>
+                                <div style="margin-top: 10px; font-size: 0.85rem;">
+                                    ${dup.vehicles.map(v => `
+                                        <div style="padding: 5px; background: #f8f9fa; margin-bottom: 5px; border-radius: 4px;">
+                                            <strong>ID:</strong> ${v.key.substring(0, 8)}... | 
+                                            <strong>المشروع:</strong> ${v.currentProject} | 
+                                            <strong>المنطقة:</strong> ${v.area} |
+                                            <strong>أنشئ بواسطة:</strong> ${v.createdBy}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div class="duplicate-count">${dup.count}</div>
+                        </div>
+                    `;
+                });
+                
+                // إضافة زر لتنظيف المكررات (للمسؤول فقط)
+                if (currentUser.role === 'admin') {
+                    html += `
+                        <div style="margin-top: 15px; display: flex; gap: 10px;">
+                            <button class="btn btn-warning btn-sm" onclick="cleanDatabaseDuplicates()">
+                                <i class="fas fa-filter"></i> تنظيف اللوحات المكررة
+                            </button>
+                            <button class="btn btn-info btn-sm" onclick="exportDuplicateReport()">
+                                <i class="fas fa-file-excel"></i> تصدير التقرير
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                resultsDiv.innerHTML = html;
+                showMessage('dashboardMessage', `تم العثور على ${duplicatePlatesInDatabase.length} لوحة مكررة`, 'warning');
+                
+            } catch (error) {
+                console.error('Error checking for duplicates:', error);
+                showMessage('dashboardMessage', 'حدث خطأ أثناء البحث عن اللوحات المكررة', 'error');
+            }
+        }
+
+        // تنظيف اللوحات المكررة في قاعدة البيانات
+        async function cleanDatabaseDuplicates() {
+            if (duplicatePlatesInDatabase.length === 0) {
+                await checkForDuplicatePlates();
+                if (duplicatePlatesInDatabase.length === 0) {
+                    return;
+                }
+            }
+            
+            const action = document.getElementById('cleanupAction')?.value || 'keep_first';
+            const cleanupDate = document.getElementById('cleanupDate')?.value;
+            
+            let confirmMessage = `هل تريد تنظيف ${duplicatePlatesInDatabase.length} لوحة مكررة؟\n\n`;
+            confirmMessage += `سيتم تطبيق الإجراء: ${action === 'keep_first' ? 'حفظ أول ظهور' : action === 'keep_last' ? 'حفظ آخر ظهور' : 'دمج البيانات'}`;
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            showMessage('dashboardMessage', 'جارٍ تنظيف اللوحات المكررة...', 'info');
+            
+            let cleanedCount = 0;
+            let errorCount = 0;
+            
+            for (const dup of duplicatePlatesInDatabase) {
+                try {
+                    const vehicles = dup.vehicles;
+                    
+                    if (action === 'keep_first') {
+                        // حفظ أول ظهور وحذف البقية
+                        const firstVehicle = vehicles[0];
+                        for (let i = 1; i < vehicles.length; i++) {
+                            const vehicleRef = database.ref('vehicles/' + vehicles[i].key);
+                            await vehicleRef.remove();
+                            cleanedCount++;
+                        }
+                    } else if (action === 'keep_last') {
+                        // حفظ آخر ظهور وحذف البقية
+                        const lastVehicle = vehicles[vehicles.length - 1];
+                        for (let i = 0; i < vehicles.length - 1; i++) {
+                            const vehicleRef = database.ref('vehicles/' + vehicles[i].key);
+                            await vehicleRef.remove();
+                            cleanedCount++;
+                        }
+                    } else if (action === 'merge') {
+                        // دمج البيانات (حفظ أحد السجلات مع دمج المعلومات)
+                        const vehicleToKeep = vehicles[0];
+                        const vehicleRef = database.ref('vehicles/' + vehicleToKeep.key);
+                        
+                        // جمع المعلومات من جميع السجلات
+                        const mergedVehicle = { ...vehicleToKeep };
+                        
+                        // دمج تاريخ التحديث
+                        mergedVehicle.lastUpdatedAt = new Date().toISOString();
+                        mergedVehicle.lastUpdatedBy = currentUser.username;
+                        
+                        // إضافة ملاحظة بالدمج
+                        const updateEntry = {
+                            updatedBy: currentUser.username,
+                            updatedAt: mergedVehicle.lastUpdatedAt,
+                            changes: `Merged ${vehicles.length} duplicate records`
+                        };
+                        
+                        const updateHistory = mergedVehicle.updateHistory || [];
+                        updateHistory.push(updateEntry);
+                        mergedVehicle.updateHistory = updateHistory;
+                        
+                        await vehicleRef.update(mergedVehicle);
+                        
+                        // حذف السجلات الأخرى
+                        for (let i = 1; i < vehicles.length; i++) {
+                            const deleteRef = database.ref('vehicles/' + vehicles[i].key);
+                            await deleteRef.remove();
+                            cleanedCount++;
+                        }
+                    }
+                    
+                } catch (error) {
+                    console.error('Error cleaning duplicate:', error);
+                    errorCount++;
+                }
+            }
+            
+            // إعادة فحص قاعدة البيانات
+            await checkForDuplicatePlates();
+            
+            showMessage('dashboardMessage', 
+                `تم تنظيف ${cleanedCount} سجل مكرر${errorCount > 0 ? `، فشل تنظيف ${errorCount} سجل` : ''}`, 
+                cleanedCount > 0 ? 'success' : 'error'
+            );
+            
+            // إعادة تحميل السجلات
+            loadVehicleRecords();
+        }
+
+        // فحص اللوحات المكررة في قاعدة البيانات (للمسؤول)
+        async function scanForDatabaseDuplicates() {
+            await checkForDuplicatePlates();
         }
 
         function showMessage(elementId, message, type) {
@@ -5341,7 +5932,7 @@
             document.getElementById('registerForm').reset();
         }
 
-        // ===== دوال التحديث الجماعي - مصححة =====
+        // ===== دوال التحديث الجماعي =====
 
         // Select update option
         function selectUpdateOption(option, element) {
@@ -5424,7 +6015,7 @@
             updateVehicleSelection();
         }
 
-        // Update vehicle selection based on current option - مصححة
+        // Update vehicle selection based on current option
         function updateVehicleSelection() {
             const newStatus = document.getElementById('bulkNewStatus').value;
             selectedVehicles.clear();
@@ -5557,7 +6148,7 @@
             document.body.appendChild(modal);
         }
 
-        // Perform bulk update - مصححة
+        // Perform bulk update
         async function performBulkUpdate(newStatus, notes) {
             showMessage('dashboardMessage', 'جارٍ تحديث المركبات...', 'info');
             
